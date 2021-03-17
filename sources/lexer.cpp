@@ -35,7 +35,7 @@ std::string Lexer::get_till(lambda condition)
 
     bool is_first = true;
     const char *begin = text_ptr;
-    while(condition(*text_ptr, is_first)){
+    while(*text_ptr and condition(*text_ptr, is_first)){
         is_first = false;
         ++text_ptr;
     }
