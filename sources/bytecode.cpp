@@ -15,7 +15,7 @@ std::ostream& operator<<(std::ostream& out, const Bytecode& bytecode)
         out << arg << " ";
     }
 
-    return out << std::endl;
+    return out;
 }
 
 const std::string opcodes_name_map[]
@@ -23,7 +23,6 @@ const std::string opcodes_name_map[]
     "Unknown",
     "Match",
     "Bit_match",
-    "Match-num",
     "Jump",
     "Split",
     "Save-Start",

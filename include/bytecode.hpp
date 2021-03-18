@@ -9,7 +9,6 @@ enum class Opcode
 {
     Match = 1,
     Bit_match,
-    Match_num,
     Jump,
     Split,
     Save_start,

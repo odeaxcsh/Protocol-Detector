@@ -12,7 +12,8 @@ enum class Token_type {
     Save_binary,
     Open_paran,
     Close_paran,
-    Iteration,
+    Iteration_start,
+    Iteration_stop,
     Or_operator,
     String,
     Integer,
@@ -34,6 +35,9 @@ class Lexer
 public:
     Lexer(const char *, std::map<char, Token_type> = defalut_operators);
 
+    char peek();
+
+    std::string get_binary();
     std::string get_int();
     std::string get_str();
     std::string get_name();

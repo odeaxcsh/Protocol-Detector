@@ -13,7 +13,8 @@ std::map<char, Token_type> defalut_operators =
 {
     {SAVE_MATCH_SIGN, Token_type::Save_match},
     {SAVE_BINARY_SIGN, Token_type::Save_binary},
-    {ITERATION_SIGN, Token_type::Iteration},
+    {ITERATION_START_SIGN, Token_type::Iteration_start},
+    {ITERATION_STOP_SIGN, Token_type::Iteration_stop},
     {'|', Token_type::Or_operator},
     {')', Token_type::Close_paran},
     {'(', Token_type::Open_paran}
@@ -24,6 +25,11 @@ Lexer::Lexer(const char *text, std::map<char, Token_type> operators_map)
     this->text = text;
     this->text_ptr = text;
     this->tokens = operators_map;
+}
+
+char Lexer::peek()
+{
+    return *text_ptr;
 }
 
 template <typename lambda>
@@ -52,6 +58,15 @@ std::string Lexer::get_int()
     return get_till(
         [](char c, bool is_first) -> bool {
             return std::isdigit(c);
+        });
+}
+
+std::string Lexer::get_binary()
+{
+    return get_till(
+        [](char c, bool is_first) -> bool {
+            return std::isdigit(c) or
+                (is_first and c == 'b');
         });
 }
 
