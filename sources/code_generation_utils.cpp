@@ -10,7 +10,7 @@ Bytecode Code_generation_utils::match_any_char()
 {
     using std::to_string;
     return Bytecode {
-        Opcode::Bit_match,
+        Opcode::Match,
         {ANY_STRING, to_string(1)}
     };
 }
@@ -57,7 +57,7 @@ Pattern Code_generation_utils::match_string_pattern(const std::string &str)
     }
 }
 
-Pattern Code_generation_utils::execute_kleene_start(const Pattern &matches_pattern)
+Pattern Code_generation_utils::execute_kleene_star(const Pattern &matches_pattern)
 {
     using std::end, std::begin;
     using std::to_string;
@@ -67,11 +67,15 @@ Pattern Code_generation_utils::execute_kleene_start(const Pattern &matches_patte
 
     result.push_back(Bytecode{
         Opcode::Split,
-        {to_string(1), to_string(matches_pattern_length + 1)}
+        {to_string(matches_pattern_length + 2), to_string(1)}
     });
 
     result.insert(end(result), begin(matches_pattern), end(matches_pattern));
 
+    result.push_back(Bytecode{
+        Opcode::Jump,
+        {to_string(-2)}
+    });
     return result;
 }
 

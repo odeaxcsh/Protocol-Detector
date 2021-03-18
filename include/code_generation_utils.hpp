@@ -14,7 +14,7 @@ struct Code_generation_utils
     Pattern execute_iteration(const Pattern &, const std::vector<std::string> &);
     Pattern execute_or_operator(const Pattern &, const Pattern &);
     Pattern execute_save_variable(const Pattern &, const std::string &);
-    Pattern execute_kleene_start(const Pattern &);
+    Pattern execute_kleene_star(const Pattern &);
 };
 
 extern struct Code_generation_utils code_generation_utils;

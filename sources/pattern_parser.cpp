@@ -124,7 +124,7 @@ Pattern Pattern_parser::iteration(bool itermatch)
                         names.insert(names.end(), bytecode.args.begin(), bytecode.args.end());
                     }
                 }
-                this_level = names.empty() ?  code_generation_utils.execute_kleene_start(this_level) : code_generation_utils.execute_iteration(this_level, names);
+                this_level = names.empty() ?  code_generation_utils.execute_kleene_star(this_level) : code_generation_utils.execute_iteration(this_level, names);
             } break;
 
             case Token_type::String:

@@ -9,6 +9,23 @@
 
 const std::string Lexer::EOT_sign = "EOT";
 
+bool operator==(const Token &first, const Token &second)
+{
+    return (first.value == second.value) and ((int)first.type == (int)second.type);
+}
+
+bool operator!=(const Token &first, const Token &second)
+{
+    return not((first.value == second.value) and ((int)first.type == (int)second.type));
+}
+
+bool operator<(const Token &first, const Token &second)
+{
+    if((int)first.type == (int)second.type)
+        return first.value < second.value;
+    else return (int)first.type < (int)second.type;
+}
+
 std::map<char, Token_type> defalut_operators =
 {
     {SAVE_MATCH_SIGN, Token_type::Save_match},
