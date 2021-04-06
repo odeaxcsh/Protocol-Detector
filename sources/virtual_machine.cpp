@@ -23,6 +23,7 @@ VM &VM::load_code(const Pattern &pattern)
 
 std::map<std::string, std::string> VM::run(const char * text, int len)
 {
+    this->stack = {};
     this->text = text;
 
     machine_state initial_state;
