@@ -12,16 +12,16 @@ file(GLOB SOURCES "sources/*.cpp")
 add_executable(${PROJECT_NAME} ${SOURCES} protocol_detector.cpp)
 target_include_directories( ${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include )
 
-set(Gtest_required_libraries  gtest gtest_main pthread)
+set(Gtest_essential gtest gtest_main pthread)
 
 find_library(GTEST gtest)
 if(NOT GTEST)
     message(WARNING "Google test is not installed, unit tests could not be generated!")
 else()
     file(GLOB TESTS "tests/*.cpp")
-    add_executable(Project_test ${TESTS} ${SOURCES})
+    add_executable(Project_test ${SOURCES} ${TESTS})
     target_include_directories( Project_test PRIVATE ${PROJECT_SOURCE_DIR}/include )
-    target_link_libraries(Project_test gtest ${Gtest_required_libraries})
+    target_link_libraries(Project_test gtest ${Gtest_essential})
     add_test(
         NAME Project_test
         COMMAND Project_test
