@@ -21,7 +21,7 @@ std::vector<char> to_string(Index start, Index end, const char *text)
     int byte_e = end.byte,
         bit_e = end.bit;
 
-    for(int i = byte_s; i <= byte_e; ++i) {
+    for(int i = byte_s; i < byte_e; ++i) {
         result.push_back(text[i]);
     }
 
