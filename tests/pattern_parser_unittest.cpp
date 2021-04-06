@@ -25,17 +25,18 @@ namespace {
 
     TEST(Parser, Test2)
     {
-        const char *text = "$(variable)."
+        const char *text = "$(variable).";
         Lexer lexer(text);
         Pattern result = Pattern_parser(lexer).parse();
 
         Pattern expected = {
             {Opcode::Split, {"3", "1"}},
             {Opcode::Match, {ANY_STRING, "1"}},
-            {Opcode::Jump, {"2"}},
+            {Opcode::Jump, {"-2"}},
             {Opcode::Match, {"."}}
         };
 
         EXPECT_EQ(expected, result);
     }
+
 }
