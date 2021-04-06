@@ -34,7 +34,7 @@ public:
     VM(const Pattern &);
 
     VM &load_code(const Pattern &);
-    std::map<std::string, std::string> run(const char *, int len = -1);
+    std::map<std::string, std::vector<char>> run(const char *, int len = -1);
 
 private:
     Pattern code;
@@ -64,6 +64,7 @@ private:
     int length = 0;
 
     std::stack<machine_state> stack;
+    const static std::string counter_name;
 };
 
 #endif

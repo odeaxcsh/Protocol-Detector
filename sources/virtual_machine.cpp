@@ -10,6 +10,27 @@ int i_th_bit(int value, int pos)
     return (value >> pos) & (1);
 }
 
+const std::string VM::counter_name = "X";
+
+std::vector<char> to_string(Index start, Index end, const char *text)
+{
+    std::vector<char> result;
+
+    int byte_s = start.byte,
+        bit_s = start.bit;
+    int byte_e = end.byte,
+        bit_e = end.bit;
+
+    for(int i = byte_s; i <= byte_e; ++i) {
+        result.push_back(text[i]);
+    }
+
+    result[0] &= (-1 << bit_s);
+    result[result.size() -1] &= (-1 >> (8 - bit_e));
+
+    return result;
+}
+
 VM::VM(const Pattern &pattern) : VM()
 {
     this->load_code(pattern);
@@ -21,7 +42,7 @@ VM &VM::load_code(const Pattern &pattern)
     return *this;
 }
 
-std::map<std::string, std::string> VM::run(const char * text, int len)
+std::map<std::string, std::vector<char>> VM::run(const char * text, int len)
 {
     this->stack = {};
     this->text = text;
@@ -81,8 +102,26 @@ std::map<std::string, std::string> VM::run(const char * text, int len)
     }
 
     if(stack.empty()) {
-        return {{"Completed", "0"}};
-    } else return {};
+        return {{"Failed", {}}};
+    }
+
+    machine_state state = stack.top();
+    std::map<std::string, std::vector<char>> result;
+    std::vector<std::string> iterations;
+
+    for(const auto &[key, value] : state.var_starts) {
+
+        if((key.length() > counter_name.length()) and
+            (0 == key.compare(key.length() - counter_name.length(), counter_name.length(), counter_name)))
+            continue;
+
+        const auto end = state.var_ends.find(key);
+        if(end != state.var_ends.end()) {
+            result[key] = (to_string(value, end->second, text));
+        }
+    }
+
+    return result;
 }
 
 bool VM::match(machine_state &state)
@@ -176,8 +215,8 @@ void VM::add_iterate(machine_state &state)
     Bytecode instruction = code[state.pc];
 
     //returns index of where variable iteration counter placed
-    auto counter_name = [](const std::string &name) -> std::string {
-        return name + "_counter";
+    auto counter_name = [this](const std::string &name) -> std::string {
+        return name + this->counter_name;
     };
 
     //Set counters at VAR STARTS NAME
