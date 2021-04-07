@@ -14,6 +14,8 @@ enum class Opcode
     Save_start,
     Save_end,
     Add_iterate,
+    Return,
+    Halt
 };
 
 typedef struct

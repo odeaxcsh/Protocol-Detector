@@ -62,6 +62,13 @@ std::map<std::string, std::vector<char>> VM::run(const char * text, int len)
             instruction = this->code[state.pc];
         else break;
 
+        if(instruction.opcode == Opcode::Return)
+            break;
+        else if(instruction.opcode == Opcode::Halt) {
+            ++(queue.front().pc);
+            continue;
+        }
+
         queue.pop();
 
         bool failed = false;

@@ -27,5 +27,7 @@ const std::string opcodes_name_map[]
     "Split",
     "Save-Start",
     "Save-end",
-    "Add-iterate"
+    "Add-iterate",
+    "Return",
+    "Halt",
 };
