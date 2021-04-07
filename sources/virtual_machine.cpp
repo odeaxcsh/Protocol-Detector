@@ -25,6 +25,10 @@ std::vector<char> to_string(Index start, Index end, const char *text)
         result.push_back(text[i]);
     }
 
+    if(byte_e == byte_s) {
+        result.push_back(text[byte_e]);
+    }
+
     result[0] &= (-1 << bit_s);
     result[result.size() -1] &= (-1 >> (8 - bit_e));
 
@@ -44,21 +48,21 @@ VM &VM::load_code(const Pattern &pattern)
 
 std::map<std::string, std::vector<char>> VM::run(const char * text, int len)
 {
-    this->stack = {};
+    this->queue = {};
     this->text = text;
 
     machine_state initial_state;
-    this->stack.push(initial_state);
+    this->queue.push(initial_state);
 
-    while(!stack.empty()) {
-        machine_state state = stack.top();
+    while(!queue.empty()) {
+        machine_state state = queue.front();
         Bytecode instruction;
 
         if(state.pc < this->code.size())
             instruction = this->code[state.pc];
         else break;
 
-        stack.pop();
+        queue.pop();
 
         bool failed = false;
         switch (instruction.opcode) {
@@ -97,15 +101,15 @@ std::map<std::string, std::vector<char>> VM::run(const char * text, int len)
         }
 
         if(not failed) {
-            stack.push(state);
+            queue.push(state);
         }
     }
 
-    if(stack.empty()) {
+    if(queue.empty()) {
         return {{"Failed", {}}};
     }
 
-    machine_state state = stack.top();
+    machine_state state = queue.front();
     std::map<std::string, std::vector<char>> result;
     std::vector<std::string> iterations;
 
@@ -193,7 +197,7 @@ void VM::split(machine_state &state)
     Bytecode instruction = code[state.pc];
     new_thread.pc = state.pc + std::stoi(instruction.args[1]);
     state.pc = state.pc + std::stoi(instruction.args[0]);
-    stack.push(new_thread);
+    queue.push(new_thread);
 }
 
 void VM::save_start(machine_state &state)
