@@ -1,29 +1,30 @@
 cmake_minimum_required(VERSION 3.10)
 
+# set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 project(Protocol-detector VERSION 1.0)
 
-set( EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin )
+# Configure google-test as a downloadable library.
+include(External_GTest.cmake)
+
+set(EXECUTABLE_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin")
+
+set(PROJECT_MAIN_FILE "protocol_detector.cpp")
+set(TEST_MAIN_FILE "tests/run_tests.cpp")
+
+set(PROJECT_TEST "${PROJECT_NAME}-Test")
 
 file(GLOB SOURCES "sources/*.cpp")
+file(GLOB TESTS "tests/*.cpp")
 
-add_executable(${PROJECT_NAME} ${SOURCES} protocol_detector.cpp)
-target_include_directories( ${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include )
+add_executable(${PROJECT_TEST} ${TEST_MAIN_FILE} ${TESTS} ${SOURCES})
+add_executable(${PROJECT_NAME} ${PROJECT_MAIN_FILE} ${SOURCES})
 
-set(Gtest_essential gtest gtest_main pthread)
+target_include_directories(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/include")
+target_include_directories(${PROJECT_TEST} PRIVATE "${PROJECT_SOURCE_DIR}/include")
 
-find_library(GTEST gtest)
-if(NOT GTEST)
-    message(WARNING "Google test is not installed, unit tests could not be generated!")
-else()
-    file(GLOB TESTS "tests/*.cpp")
-    add_executable(Project_test ${SOURCES} ${TESTS})
-    target_include_directories( Project_test PRIVATE ${PROJECT_SOURCE_DIR}/include )
-    target_link_libraries(Project_test gtest ${Gtest_essential})
-    add_test(
-        NAME Project_test
-        COMMAND Project_test
-    )
-endif()
+target_link_libraries(${PROJECT_TEST} ${GTEST_LIBRARY} ${GMOCK_LIBRARY})
+
+add_test(NAME ${PROJECT_TEST} COMMAND ${PROJECT_TEST})
