@@ -74,7 +74,7 @@ Pattern Code_generation_utils::execute_kleene_star(const Pattern &matches_patter
 
     result.push_back(Bytecode{
         Opcode::Jump,
-        {to_string(-2)}
+        {to_string( -(matches_pattern_length + 1))}
     });
     return result;
 }

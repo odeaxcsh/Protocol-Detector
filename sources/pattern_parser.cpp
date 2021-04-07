@@ -117,7 +117,7 @@ Pattern Pattern_parser::iteration(bool itermatch)
                 break;
 
             case Token_type::Iteration_start: {
-                this_level = parse();
+                this_level = iteration(true);
                 std::vector<std::string> names;
                 for(const Bytecode &bytecode : this_level) {
                     if(bytecode.opcode == Opcode::Save_start) {
