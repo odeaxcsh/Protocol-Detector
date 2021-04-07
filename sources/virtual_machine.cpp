@@ -29,8 +29,8 @@ std::vector<char> to_string(Index start, Index end, const char *text)
         result.push_back(text[byte_e]);
     }
 
-    result[0] &= (-1 << bit_s);
-    result[result.size() -1] &= (-1 >> (8 - bit_e));
+    result[0] &= (static_cast<unsigned char>(-1) >> bit_s);
+    result[result.size() -1] &= (static_cast<unsigned char>(-1) << bit_e);
 
     return result;
 }
@@ -175,13 +175,10 @@ bool VM::bit_match(machine_state &state)
 
     int i = 0;
     for(; i < len; ++i) {
-        if((any && text[index.byte + (index.bit > 0)]) or
+        if((any && text[index.byte]) or
         ((not any) and ((instruction.args[0][i + 1] - '0') == i_th_bit(text[index.byte], index.bit))))
             index.inc_bit();
-        else {
-            std::cout << i << " " << i_th_bit(text[index.byte], index.bit);
-            break;
-        }
+        else break;
     }
 
     if(i != len)
