@@ -46,12 +46,13 @@ VM &VM::load_code(const Pattern &pattern)
     return *this;
 }
 
-std::map<std::string, std::vector<char>> VM::run(const char * text, int len)
+std::map<std::string, std::vector<char>> VM::run(const char * text, Index start)
 {
     this->queue = {};
     this->text = text;
 
     machine_state initial_state;
+    initial_state.Index = Index;
     this->queue.push(initial_state);
 
     while(!queue.empty()) {
@@ -119,9 +120,9 @@ std::map<std::string, std::vector<char>> VM::run(const char * text, int len)
     machine_state state = queue.front();
     std::map<std::string, std::vector<char>> result;
     std::vector<std::string> iterations;
+    last_match = state.Index;
 
     for(const auto &[key, value] : state.var_starts) {
-
         if((key.length() > counter_name.length()) and
             (0 == key.compare(key.length() - counter_name.length(), counter_name.length(), counter_name)))
             continue;
