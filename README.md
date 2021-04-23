@@ -8,3 +8,6 @@ After installing `cmake`, `make` and `GTest`(optional for compile tests) use fol
   - add `-Dcompile_project_tests` option to compile tests too.
 - compile code using `make`
 - executables are placed in `bin`
+
+## Components diagram
+![Screenshot](project-data/project-diagram.png)
