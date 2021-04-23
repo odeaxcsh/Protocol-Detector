@@ -53,7 +53,7 @@ std::tuple<matched_packet &, bool> Protocol::match(const char *packet, int len, 
 
   VM vm(this->pattern);
   auto variables = vm.run(packet, len, matched.index);
-  if(variables.find("Failed") == variables.end())
+  if(variables.find("Failed") != variables.end())
     return {matched, false};
 
   matched.index = vm.get_last_index();
