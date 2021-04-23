@@ -52,7 +52,7 @@ std::map<std::string, std::vector<char>> VM::run(const char * text, Index start)
     this->text = text;
 
     machine_state initial_state;
-    initial_state.Index = Index;
+    initial_state.index = start;
     this->queue.push(initial_state);
 
     while(!queue.empty()) {
@@ -120,7 +120,7 @@ std::map<std::string, std::vector<char>> VM::run(const char * text, Index start)
     machine_state state = queue.front();
     std::map<std::string, std::vector<char>> result;
     std::vector<std::string> iterations;
-    last_match = state.Index;
+    last_match = state.index;
 
     for(const auto &[key, value] : state.var_starts) {
         if((key.length() > counter_name.length()) and

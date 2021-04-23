@@ -35,8 +35,8 @@ public:
 
     VM &load_code(const Pattern &);
     std::map<std::string, std::vector<char>> run(const char *, Index start={0, 0});
-    Index last_match() const { return last_match; }
-  
+    Index get_last_index() const { return last_match; }
+
 private:
     Pattern code;
     Index last_match;
