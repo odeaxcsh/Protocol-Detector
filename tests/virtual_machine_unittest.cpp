@@ -24,7 +24,7 @@ namespace
 
         VM vm(code);
 
-        auto output = vm.run("");
+        auto output = vm.run("", 0);
 
         EXPECT_THAT(output, IsEmpty());
     }
@@ -39,7 +39,7 @@ namespace
 
         VM vm(code);
 
-        auto output = vm.run("ABCD");
+        auto output = vm.run("ABCD", 4);
 
         EXPECT_EQ(output.size(), 1);
         EXPECT_THAT(output["variable"], ElementsAre('A', 'B', 'C'));
@@ -60,7 +60,7 @@ namespace
         };
 
         VM vm(code);
-        auto output = vm.run("");
+        auto output = vm.run("", 0);
 
         EXPECT_EQ(output.size(), 0);
     }
@@ -74,7 +74,7 @@ namespace
         };
 
         VM vm(code);
-        auto output = vm.run("");
+        auto output = vm.run("", 0);
 
         EXPECT_EQ(output.size(), 0);
     }
@@ -92,7 +92,7 @@ namespace
         };
 
         VM vm(code);
-        auto output = vm.run("ABACAD.");
+        auto output = vm.run("ABACAD.", 7);
 
         EXPECT_EQ(output.size(), 4);
         EXPECT_THAT(output["name0"], ElementsAre('A', 'B'));
@@ -116,7 +116,7 @@ namespace
         };
 
         VM vm(code);
-        auto output = vm.run(std::string(1, binary_to_char("10101001")).c_str());
+        auto output = vm.run(std::string(1, binary_to_char("10101001")).c_str(), 1);
 
         EXPECT_THAT(output["upper"], ElementsAre(binary_to_char("10100000")));
         EXPECT_THAT(output["lower"], ElementsAre(binary_to_char("00001001")));

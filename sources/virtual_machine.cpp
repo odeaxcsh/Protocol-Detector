@@ -46,10 +46,11 @@ VM &VM::load_code(const Pattern &pattern)
     return *this;
 }
 
-std::map<std::string, std::vector<char>> VM::run(const char * text, Index start)
+std::map<std::string, std::vector<char>> VM::run(const char * text, int end, Index start)
 {
     this->queue = {};
     this->text = text;
+    this->end = end;
 
     machine_state initial_state;
     initial_state.index = start;
@@ -152,7 +153,8 @@ bool VM::match(machine_state &state)
 
     int i = 0;
     for(; i < len; ++i) {
-        if ((any and text[ibyte]) or ((not any) and (instruction.args[0][i] == text[ibyte])))
+        if ((any and ibyte < end) or
+        ((not any) and (instruction.args[0][i] == text[ibyte])))
             ++ibyte;
         else break;
     }
@@ -176,7 +178,7 @@ bool VM::bit_match(machine_state &state)
 
     int i = 0;
     for(; i < len; ++i) {
-        if((any && text[index.byte]) or
+        if((any && index.byte < end) or
         ((not any) and ((instruction.args[0][i + 1] - '0') == i_th_bit(text[index.byte], index.bit))))
             index.inc_bit();
         else break;

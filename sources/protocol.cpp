@@ -41,7 +41,7 @@ Protocol::Protocol(const Json::Value &value) : requirements(3)
   this->protocol_mapper[name] = this;
 }
 
-std::tuple<matched_packet &, bool> Protocol::match(const char *packet, matched_packet &matched)
+std::tuple<matched_packet &, bool> Protocol::match(const char *packet, int len, matched_packet &matched)
 {
   if(this->layer != matched.layer_count)
     return {matched, false};
@@ -52,7 +52,7 @@ std::tuple<matched_packet &, bool> Protocol::match(const char *packet, matched_p
   }
 
   VM vm(this->pattern);
-  auto variables = vm.run(packet, matched.index);
+  auto variables = vm.run(packet, len, matched.index);
   if(variables.find("Failed") == variables.end())
     return {matched, false};
 
