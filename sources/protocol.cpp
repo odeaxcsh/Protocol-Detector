@@ -3,6 +3,7 @@
 #include "pattern_parser.hpp"
 #include "virtual_machine.hpp"
 
+#include <algorithm>
 #include <optional>
 #include <tuple>
 #include <fstream>
@@ -23,7 +24,7 @@ Protocol Protocol::from_file(const std::string &path)
   return (Protocol(json));
 }
 
-Protocol::Protocol(const Json::Value &value) : requirements(3), ports()
+Protocol::Protocol(const Json::Value &value) : requirements(3)
 {
   this->id = ++id_generator_core;
   this->name = value["name"].asString();
@@ -46,7 +47,7 @@ std::tuple<matched_packet &, bool> Protocol::match(const char *packet, matched_p
     return {matched, false};
 
   for(int i = 0; i < this->layer-1; ++i) {
-    if(this->requirements[i].find(matched.protocols[i].matched_protocol) ==  requirements[i].end())
+    if(std::find(requirements[i].begin(), requirements[i].end(), matched.protocols[i].matched_protocol) ==  requirements[i].end())
       return {matched, false};
   }
 
