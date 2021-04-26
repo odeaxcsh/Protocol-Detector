@@ -14,12 +14,13 @@ set(PROJECT_MAIN_FILE "protocol_detector.cpp")
 #find JsonCPP
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(JSONCPP jsoncpp)
+find_library(TINS_LIBRARY tins)
 
 file(GLOB SOURCES "sources/*.cpp")
 
 add_executable(${PROJECT_NAME} ${PROJECT_MAIN_FILE} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE  "${PROJECT_SOURCE_DIR}/include" "${JSONCPP_INCLUDE_DIRS}")
-target_link_libraries(${PROJECT_NAME} ${JSONCPP_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${JSONCPP_LIBRARIES} ${TINS_LIBRARY})
 
 if(compile_project_test)
   include(External_GTest.cmake)
@@ -31,7 +32,7 @@ if(compile_project_test)
   add_executable(${PROJECT_TEST} ${TEST_MAIN_FILE} ${TESTS} ${SOURCES})
 
   target_include_directories(${PROJECT_TEST} PRIVATE  "${PROJECT_SOURCE_DIR}/include" "${JSONCPP_INCLUDE_DIRS}")
-  target_link_libraries(${PROJECT_TEST} ${GTEST_LIBRARY} ${GMOCK_LIBRARY} ${JSONCPP_LIBRARIES})
+  target_link_libraries(${PROJECT_TEST} ${GTEST_LIBRARY} ${GMOCK_LIBRARY} ${JSONCPP_LIBRARIES} ${TINS_LIBRARY})
 
   add_test(NAME ${PROJECT_TEST} COMMAND ${PROJECT_TEST})
 endif()
