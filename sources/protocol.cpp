@@ -34,7 +34,7 @@ Protocol::Protocol(const Json::Value &value) : requirements(3)
   std::string &&pattern = value["pattern"].asString();
   std::string &&ignores = value["pattern-ignores"].asString();
 
-  std::map<std::string, std::string> escapes = {{"\\n", "\n"}, {"\\r", "\r"}};
+  std::map<std::string, std::string> escapes = {{"\\n", "\n"}, {"\\r", "\r"}, {"\\t", "\t"}};
 
   for(auto [c, e] : escapes)
     pattern = std::regex_replace(pattern, std::regex(c), e);
