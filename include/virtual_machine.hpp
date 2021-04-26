@@ -34,7 +34,9 @@ public:
     VM(const Pattern &);
 
     VM &load_code(const Pattern &);
-    std::map<std::string, std::vector<char>> run(const char *, int end,Index start={0, 0});
+    std::map<std::string, std::vector<unsigned char>> run(const char *, int end,Index start={0, 0});
+    std::map<std::string, std::vector<unsigned char>> run(std::vector<unsigned char> &, int end,Index start={0, 0});
+
     Index get_last_index() const { return last_match; }
 
 private:
@@ -63,7 +65,7 @@ private:
     void save_end(machine_state &state);
     void add_iterate(machine_state &state);
 
-    const char *text;
+    std::vector<unsigned char> text;
     int length = 0;
 
     std::queue<machine_state> queue;

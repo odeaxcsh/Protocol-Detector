@@ -14,7 +14,7 @@ class Protocol
 {
 public:
   Protocol(const Json::Value& );
-  std::tuple<matched_packet &, bool> match(const char *, int len, matched_packet &);
+  std::tuple<matched_packet &, bool> match(std::vector<unsigned char> &, int len, matched_packet &);
 
   static Protocol from_file(const std::string &);
   static std::map<std::string, const Protocol*> protocol_mapper;

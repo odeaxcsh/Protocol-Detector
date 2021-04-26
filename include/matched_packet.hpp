@@ -5,7 +5,7 @@
 
 struct matched_protocol
 {
-  std::map<std::string, std::vector<char>> variables;
+  std::map<std::string, std::vector<unsigned char>> variables;
   std::string matched_protocol;
   int layer;
 };

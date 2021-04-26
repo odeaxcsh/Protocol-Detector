@@ -29,25 +29,38 @@ Protocol::Protocol(const Json::Value &value) : requirements(3)
   this->id = ++id_generator_core;
   this->name = value["name"].asString();
   this->layer = value["layer"].asInt();
-  const std::string &&pattern = value["pattern"].asString();
+  std::string &&pattern = value["pattern"].asString();
+  std::string &&ignores = value["pattern-ignores"].asString();
+
+  pattern.erase(std::remove_if(pattern.begin(), pattern.end(),
+                      [&ignores](char c) {
+                          return ignores.find(c) != std::string::npos;
+                      }),
+                      pattern.end()
+                );
+
   Lexer lexer = (pattern.c_str());
   this->pattern = Pattern_parser(lexer).parse();
 
   for(auto object : value["requirements"])
     for(auto value : object["protocols"])
-      this->requirements[object["layer"].asInt()]
+      this->requirements[object["layer"].asInt() - 1]
         .push_back(value.asString());
 
   this->protocol_mapper[name] = this;
 }
 
-std::tuple<matched_packet &, bool> Protocol::match(const char *packet, int len, matched_packet &matched)
+std::tuple<matched_packet &, bool> Protocol::match(std::vector<unsigned char> &packet, int len, matched_packet &matched)
 {
   if(this->layer != matched.layer_count)
     return {matched, false};
 
   for(int i = 0; i < this->layer-1; ++i) {
-    if(std::find(requirements[i].begin(), requirements[i].end(), matched.protocols[i].matched_protocol) ==  requirements[i].end())
+    if(std::find_if(requirements[i].begin(), requirements[i].end(),
+      [&matched, &i](auto x){
+        return x == matched.protocols[i].matched_protocol or x == "ANY";
+      }
+    ) ==  requirements[i].end())
       return {matched, false};
   }
 

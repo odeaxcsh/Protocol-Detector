@@ -5,16 +5,16 @@
 #include <exception>
 #include <iostream>
 
-int i_th_bit(int value, int pos)
+int i_th_bit(unsigned char value, int pos)
 {
     return (value >> pos) & (1);
 }
 
 const std::string VM::counter_name = "X";
 
-std::vector<char> to_string(Index start, Index end, const char *text)
+std::vector<unsigned char> to_string(Index start, Index end, const std::vector<unsigned char> &text)
 {
-    std::vector<char> result;
+    std::vector<unsigned char> result;
 
     int byte_s = start.byte,
         bit_s = start.bit;
@@ -46,7 +46,13 @@ VM &VM::load_code(const Pattern &pattern)
     return *this;
 }
 
-std::map<std::string, std::vector<char>> VM::run(const char * text, int end, Index start)
+std::map<std::string, std::vector<unsigned char>> VM::run(const char *text, int end, Index start)
+{
+  std::vector<unsigned char> vec(text, text + end);
+  return this->run(vec, end, start);
+}
+
+std::map<std::string, std::vector<unsigned char>> VM::run(std::vector<unsigned char> &text, int end, Index start)
 {
     this->queue = {};
     this->text = text;
@@ -119,7 +125,7 @@ std::map<std::string, std::vector<char>> VM::run(const char * text, int end, Ind
     }
 
     machine_state state = queue.front();
-    std::map<std::string, std::vector<char>> result;
+    std::map<std::string, std::vector<unsigned char>> result;
     std::vector<std::string> iterations;
     last_match = state.index;
 
