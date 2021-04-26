@@ -3,6 +3,8 @@
 #include "pattern_parser.hpp"
 #include "virtual_machine.hpp"
 
+
+#include <regex>
 #include <algorithm>
 #include <optional>
 #include <tuple>
@@ -32,12 +34,21 @@ Protocol::Protocol(const Json::Value &value) : requirements(3)
   std::string &&pattern = value["pattern"].asString();
   std::string &&ignores = value["pattern-ignores"].asString();
 
+  std::map<std::string, std::string> escapes = {{"\\n", "\n"}, {"\\r", "\r"}};
+
+  for(auto [c, e] : escapes)
+    pattern = std::regex_replace(pattern, std::regex(c), e);
+
+  for(auto [c, e] : escapes)
+      ignores = std::regex_replace(ignores, std::regex(c), e);
+
   pattern.erase(std::remove_if(pattern.begin(), pattern.end(),
                       [&ignores](char c) {
                           return ignores.find(c) != std::string::npos;
                       }),
                       pattern.end()
                 );
+
 
   Lexer lexer = (pattern.c_str());
   this->pattern = Pattern_parser(lexer).parse();
