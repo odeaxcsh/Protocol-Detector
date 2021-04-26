@@ -37,9 +37,6 @@ Protocol::Protocol(const Json::Value &value) : requirements(3)
   std::map<std::string, std::string> escapes = {{"\\n", "\n"}, {"\\r", "\r"}, {"\\t", "\t"}};
 
   for(auto [c, e] : escapes)
-    pattern = std::regex_replace(pattern, std::regex(c), e);
-
-  for(auto [c, e] : escapes)
       ignores = std::regex_replace(ignores, std::regex(c), e);
 
   pattern.erase(std::remove_if(pattern.begin(), pattern.end(),
@@ -49,6 +46,8 @@ Protocol::Protocol(const Json::Value &value) : requirements(3)
                       pattern.end()
                 );
 
+  for(auto [c, e] : escapes)
+    pattern = std::regex_replace(pattern, std::regex(c), e);
 
   Lexer lexer = (pattern.c_str());
   this->pattern = Pattern_parser(lexer).parse();
