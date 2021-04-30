@@ -1,10 +1,11 @@
 #include "pattern_parser.hpp"
 #include "virtual_machine.hpp"
 #include "protocol.hpp"
+#include "elicitation_utils.hpp"
 
 #include <iostream>
 #include <json/json.h>
-#include <tins/tins.h>
+#include "tins/tins.h"
 using namespace Tins;
 
 std::ostream& operator<<(std::ostream& out, std::vector<unsigned char> str)
@@ -16,13 +17,13 @@ std::ostream& operator<<(std::ostream& out, std::vector<unsigned char> str)
 }
 
 bool callback(const PDU &pdu) {
-
-    const IP &x = pdu.rfind_pdu<IP>(); // non-const works as well
-    std::cout << "Destination address: " << x.dst_addr() << std::endl;
-    const TCP &y = pdu.rfind_pdu<TCP>();
-    std::cout << "POrt" << y.sport() << " " << y.dport() << std::endl;
+  const IP &x = pdu.rfind_pdu<IP>(); // non-const works as well
+  std::cout << "Destination address: " << x.dst_addr() << std::endl;
+  const TCP &y = pdu.rfind_pdu<TCP>();
+  std::cout << "POrt" << y.sport() << " " << y.dport() << std::endl;
 
   EthernetII packet = pdu.rfind_pdu<EthernetII>();
+  RawPDU raw = pdu.rfind_pdu<RawPDU>();
 
   PDU::serialization_type buffer = packet.serialize();
   Protocol ethernet = Protocol::from_file("/home/sophie/Desktop/network_intership_phistaz-rayanesh/p3-advanced/configurations/Ethernet.conf");
@@ -57,7 +58,7 @@ bool callback(const PDU &pdu) {
 
 int main(int argc, char *argv[])
 {
-  auto x = Sniffer("lo");
-  x.set_filter("tcp");
+  auto x = Sniffer("wlp3s0");
+  x.set_filter("tcp.src_port==80");
   x.sniff_loop(callback);
 }
