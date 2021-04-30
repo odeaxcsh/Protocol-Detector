@@ -14,6 +14,9 @@ bool operator== (const Bytecode &first, const  Bytecode &second)
 
 bool operator== (const Pattern &first, const Pattern &second)
 {
+    if(first.size() != second.size())
+        return false;
+  
     for(int i = 0; i < first.size(); ++i)
         if(!(first[i] == second[i]))
             return false;
