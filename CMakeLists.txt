@@ -14,7 +14,7 @@ set(PROJECT_MAIN_FILE "protocol_detector.cpp")
 #find JsonCPP
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(JSONCPP jsoncpp)
-find_library(TINS_LIBRARY tins)
+include(External_LibTins.cmake)
 
 file(GLOB SOURCES "sources/*.cpp")
 
