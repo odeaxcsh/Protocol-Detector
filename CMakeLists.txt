@@ -22,17 +22,15 @@ add_executable(${PROJECT_NAME} ${PROJECT_MAIN_FILE} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE  "${PROJECT_SOURCE_DIR}/include" "${JSONCPP_INCLUDE_DIRS}")
 target_link_libraries(${PROJECT_NAME} ${JSONCPP_LIBRARIES} ${TINS_LIBRARY})
 
-if(compile_project_test)
-  include(External_GTest.cmake)
-  file(GLOB TESTS "tests/*.cpp")
+include(External_GTest.cmake)
+file(GLOB TESTS "tests/*.cpp")
 
-  set(TEST_MAIN_FILE "tests/run_tests.cpp")
-  set(PROJECT_TEST "${PROJECT_NAME}-Test")
+set(TEST_MAIN_FILE "tests/run_tests.cpp")
+set(PROJECT_TEST "${PROJECT_NAME}-Test")
 
-  add_executable(${PROJECT_TEST} ${TEST_MAIN_FILE} ${TESTS} ${SOURCES})
+add_executable(${PROJECT_TEST} ${TEST_MAIN_FILE} ${TESTS} ${SOURCES})
 
-  target_include_directories(${PROJECT_TEST} PRIVATE  "${PROJECT_SOURCE_DIR}/include" "${JSONCPP_INCLUDE_DIRS}")
-  target_link_libraries(${PROJECT_TEST} ${GTEST_LIBRARY} ${GMOCK_LIBRARY} ${JSONCPP_LIBRARIES} ${TINS_LIBRARY})
+target_include_directories(${PROJECT_TEST} PRIVATE  "${PROJECT_SOURCE_DIR}/include" "${JSONCPP_INCLUDE_DIRS}")
+target_link_libraries(${PROJECT_TEST} ${GTEST_LIBRARY} ${GMOCK_LIBRARY} ${JSONCPP_LIBRARIES} ${TINS_LIBRARY})
 
-  add_test(NAME ${PROJECT_TEST} COMMAND ${PROJECT_TEST})
-endif()
+add_test(NAME ${PROJECT_TEST} COMMAND ${PROJECT_TEST})
