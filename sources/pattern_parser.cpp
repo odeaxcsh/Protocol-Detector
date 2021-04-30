@@ -99,8 +99,8 @@ Pattern Pattern_parser::parse()
 
 Pattern Pattern_parser::iteration(bool itermatch)
 {
-    Pattern result;
-    Pattern this_level;
+    Pattern result = {};
+    Pattern this_level = {};
 
     Token token;
     while(not (lexer.is_eot(token.value) or (token.type == Token_type::Iteration_stop and itermatch)))
