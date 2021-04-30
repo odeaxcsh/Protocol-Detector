@@ -22,6 +22,7 @@ add_executable(${PROJECT_NAME} ${PROJECT_MAIN_FILE} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE  "${PROJECT_SOURCE_DIR}/include" "${JSONCPP_INCLUDE_DIRS}")
 target_link_libraries(${PROJECT_NAME} ${JSONCPP_LIBRARIES} ${TINS_LIBRARY})
 
+include(CTest)
 include(External_GTest.cmake)
 file(GLOB TESTS "tests/*.cpp")
 
