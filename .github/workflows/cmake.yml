@@ -21,10 +21,14 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
-    - name: Install libpcap
+    - name: Install libpcap library
       # installing libpcap as libtins dependency
       run: sudo apt install libpcap-dev
-      
+    
+    - name: Instal jsoncpp library
+      # installing jsoncpp as project dependency
+      run: sudo apt-get install libjsoncpp-dev
+
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
