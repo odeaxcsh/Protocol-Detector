@@ -17,6 +17,14 @@ enum class Token_type {
     Or_operator,
     String,
     Integer,
+
+    Sum_op,
+    Div_op,
+    Mul_op,
+    Sub_op,
+    Les_op,
+    gre_op,
+    eq_op,
 };
 
 extern std::map<char, Token_type> defalut_operators;
