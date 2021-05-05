@@ -19,22 +19,22 @@ public:
     virtual dtype eval(const std::map<std::string, std::vector<unsigned char>> &) const = 0;
 };
 
-template<typename dtype, dtype(*Operator)(dtype, dtype)> 
-class Binary_operator : public Base_expression<dtype>
+template<typename outdtype, typename intype, outdtype(*Operator)(intype, intype)> 
+class Binary_operator : public Base_expression<outdtype>
 {
 public:
-    Binary_operator(const Base_expression<dtype> *r, const Base_expression<dtype> *l) : right(r), left(l)
+    Binary_operator(const Base_expression<intype> *r, const Base_expression<intype> *l) : right(r), left(l)
     {
 
     }
 
-    virtual dtype eval(const std::map<std::string, std::vector<unsigned char>> &variables) const
+    virtual outdtype eval(const std::map<std::string, std::vector<unsigned char>> &variables) const
     {
         return Operator(left->eval(variables), right->eval(variables));
     }
 
 private:
-    const Base_expression<dtype> *right, *left;
+    const Base_expression<intype> *right, *left;
 };
 
 template<typename dtype, dtype(*Operator)(dtype, dtype)>
@@ -59,7 +59,7 @@ template<typename dtype>
 class Value : public Base_expression<dtype>
 {
 public:
-    Value(const dtype &val) : value(&val)
+    Value(const dtype &val) : value(val)
     {
 
     }
@@ -70,7 +70,7 @@ public:
     }
 
 private:
-    const dtype *value;
+    const dtype value;
 };
 
 
@@ -130,9 +130,13 @@ public:
     Base_expression<dtype> *parse(std::string expression) const;
 
     using Int_expressions = Base_expression<int>;
-    using Int_Sum = Binary_operator<int, +[](int a, int b)->int { return a + b; }>;
-    using Int_Mul = Binary_operator<int, +[](int a, int b)->int { return a * b; }>;
-    using Int_Div = Binary_operator<int, +[](int a, int b)->int { return  a / b; }>;
+    using Int_Sum = Binary_operator<int, int, +[](int a, int b)->int { return a + b; }>;
+    using Int_Mul = Binary_operator<int, int, +[](int a, int b)->int { return a * b; }>;
+    using Int_Div = Binary_operator<int, int, +[](int a, int b)->int { return  a / b; }>;
+
+    using Int_EQ = Binary_operator<bool, int, +[](int a, int b)->bool { return a == b; }>;
+    using Int_Le = Binary_operator<bool, int, +[](int a, int b)->bool { return a < b; }>;
+    using Int_Gr = Binary_operator<bool, int, +[](int a, int b)->bool { return b < a; }>;
 
     const static std::map<char, Token_type> defalut_operators;
     const static std::map<Token_type, int> priority;

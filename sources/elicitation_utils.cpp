@@ -7,9 +7,9 @@
 #include <functional>
 #include <type_traits>
 #include <iostream>
+#include <regex>
 
-std::string trim(const std::string& str,
-                 const std::string& whitespace = " \t")
+std::string trim(const std::string& str, const std::string& whitespace = " \t")
 {
     const auto strBegin = str.find_first_not_of(whitespace);
     if (strBegin == std::string::npos)
@@ -63,6 +63,9 @@ Base_expression<dtype> *Formula_parser::parse(std::string expression) const
 template <>
 Base_expression<int> *Formula_parser::parse(std::string expression) const
 {
+    if(expression == "")
+        return nullptr;
+    
     expression = "(" + expression + ")";
     Lexer lexer = Lexer(expression.c_str(), defalut_operators);
     std::stack<Base_expression<int> *> vars_stack;
@@ -100,11 +103,15 @@ Base_expression<int> *Formula_parser::parse(std::string expression) const
     };
 
     Token token = lexer.get_token();
+    std::regex number("(\\+|-)?([0-9]+)");
 
     while(not (lexer.is_eot(token.value))) {
         if(token.type == Token_type::String) {
             std::string spaceless = trim(token.value);
-            if(spaceless != "")
+            std::smatch m;
+            if(std::regex_match(spaceless, m, number))
+                vars_stack.push(new Value<int>(std::stoi(spaceless)));
+            else if(spaceless != "")
                 vars_stack.push(new Ref_Value<int>(spaceless));
         } else if(token.type == Token_type::Close_paran) {
             Token_type tok;
