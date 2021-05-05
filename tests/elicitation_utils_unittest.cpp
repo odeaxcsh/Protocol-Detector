@@ -13,8 +13,8 @@ namespace {
         var_t var = {{"THIS", {12}}};
         
         auto parser = Formula_parser();
-        auto compiled = parser.parse<int>(expr, var);
-        auto value = compiled->eval();
+        auto compiled = parser.parse<int>(expr);
+        auto value = compiled->eval(var);
         
         EXPECT_EQ(value, 12);
     }
@@ -25,8 +25,8 @@ namespace {
         var_t var = {{"THIS", {12}}, {"THAT", {15}}};
         
         auto parser = Formula_parser();
-        auto compiled = parser.parse<int>(expr, var);
-        auto value = compiled->eval();
+        auto compiled = parser.parse<int>(expr);
+        auto value = compiled->eval(var);
         
         EXPECT_EQ(value, 27);
     }
@@ -37,8 +37,8 @@ namespace {
         var_t var = {{"THIS", {12}}, {"THAT", {15}}};
         
         auto parser = Formula_parser();
-        auto compiled = parser.parse<int>(expr, var);
-        auto value = compiled->eval();
+        auto compiled = parser.parse<int>(expr);
+        auto value = compiled->eval(var);
         
         EXPECT_EQ(value, 180);
     }
@@ -49,8 +49,8 @@ namespace {
         var_t var = {{"THIS", {180}}, {"THAT", {9}}};
         
         auto parser = Formula_parser();
-        auto compiled = parser.parse<int>(expr, var);
-        auto value = compiled->eval();
+        auto compiled = parser.parse<int>(expr);
+        auto value = compiled->eval(var);
         
         EXPECT_EQ(value, 20);
     }
@@ -61,8 +61,8 @@ namespace {
         var_t var = {{"a", {3}}, {"b", {4}}, {"c", {7}}};
         
         auto parser = Formula_parser();
-        auto compiled = parser.parse<int>(expr, var);
-        auto value = compiled->eval();
+        auto compiled = parser.parse<int>(expr);
+        auto value = compiled->eval(var);
         
         EXPECT_EQ(value, 49);
     }
@@ -73,8 +73,8 @@ namespace {
         var_t var = {{"a", {3}}, {"b", {4}}, {"c", {7}}, {"d", {1}}};
         
         auto parser = Formula_parser();
-        auto compiled = parser.parse<int>(expr, var);
-        auto value = compiled->eval();
+        auto compiled = parser.parse<int>(expr);
+        auto value = compiled->eval(var);
         
         EXPECT_EQ(value, 56);
     }

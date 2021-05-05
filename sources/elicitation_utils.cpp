@@ -56,12 +56,12 @@ const std::map<Token_type, int> Formula_parser::priority =
 };
 
 template<typename dtype>
-Base_expression<dtype> *Formula_parser::parse(std::string expression, const std::map<std::string, std::vector<unsigned char>> &variables) const
+Base_expression<dtype> *Formula_parser::parse(std::string expression) const
 {
 }
 
 template <>
-Base_expression<int> *Formula_parser::parse(std::string expression, const std::map<std::string, std::vector<unsigned char>> &variables) const
+Base_expression<int> *Formula_parser::parse(std::string expression) const
 {
     expression = "(" + expression + ")";
     Lexer lexer = Lexer(expression.c_str(), defalut_operators);
@@ -105,7 +105,7 @@ Base_expression<int> *Formula_parser::parse(std::string expression, const std::m
         if(token.type == Token_type::String) {
             std::string spaceless = trim(token.value);
             if(spaceless != "")
-                vars_stack.push(new Ref_Value<int>(variables, spaceless));
+                vars_stack.push(new Ref_Value<int>(spaceless));
         } else if(token.type == Token_type::Close_paran) {
             Token_type tok;
             do {

@@ -16,7 +16,7 @@ template<typename dtype>
 class Base_expression
 {
 public:
-    virtual dtype eval() const = 0;
+    virtual dtype eval(const std::map<std::string, std::vector<unsigned char>> &) const = 0;
 };
 
 template<typename dtype, dtype(*Operator)(dtype, dtype)> 
@@ -28,9 +28,9 @@ public:
 
     }
 
-    virtual dtype eval() const
+    virtual dtype eval(const std::map<std::string, std::vector<unsigned char>> &variables) const
     {
-        return Operator(left->eval(), right->eval());
+        return Operator(left->eval(variables), right->eval(variables));
     }
 
 private:
@@ -46,9 +46,9 @@ public:
 
     }
 
-    virtual dtype eval() const
+    virtual dtype eval(const std::map<std::string, std::vector<unsigned char>> &variables) const
     {
-        return Operator(down_node->eval());
+        return Operator(down_node->eval(variables));
     }
 
 private:
@@ -64,7 +64,7 @@ public:
 
     }
 
-    virtual dtype eval() const 
+    virtual dtype eval(const std::map<std::string, std::vector<unsigned char>> &variables) const 
     {
         return this->value;
     }
@@ -83,10 +83,10 @@ public:
         
     }
 
-    virtual dtype eval() const 
+    virtual dtype eval(const std::map<std::string, std::vector<unsigned char>> &variables) const 
     {
         if constexpr (std::is_same_v<ftype, dtype>) {
-            return this->value->eval();
+            return this->value->eval(variables);
         }
     }
 
@@ -98,13 +98,12 @@ template<typename dtype>
 class Ref_Value : public Base_expression<dtype>
 {
 public:
-    Ref_Value(const std::map<std::string, std::vector<unsigned char>> &variables, std::string ref_name) :
-     variables(variables), ref_name(ref_name)
+    Ref_Value(std::string ref_name) : ref_name(ref_name)
     {
 
     }
 
-    virtual dtype eval() const 
+    virtual dtype eval(const std::map<std::string, std::vector<unsigned char>> &variables) const 
     {
         if constexpr (std::is_same_v<dtype, int>) {
             return get_int(variables.at(ref_name));
@@ -117,7 +116,6 @@ public:
 
 private:
     const std::string ref_name;
-    const std::map<std::string, std::vector<unsigned char>> &variables;
 };
 
 class Formula_parser
@@ -129,7 +127,7 @@ public:
     }
 
     template <typename dtype>
-    Base_expression<dtype> *parse(std::string expression, const std::map<std::string, std::vector<unsigned char>> &) const;
+    Base_expression<dtype> *parse(std::string expression) const;
 
     using Int_expressions = Base_expression<int>;
     using Int_Sum = Binary_operator<int, +[](int a, int b)->int { return a + b; }>;
