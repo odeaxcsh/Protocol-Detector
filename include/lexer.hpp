@@ -49,9 +49,10 @@ public:
     std::string get_int();
     std::string get_str();
     std::string get_name();
+    std::string get_operand();
     bool is_eot(const std::string &);
 
-    Token get_token();
+    Token get_token(bool=false);
 
 private:
     template <typename lambda>

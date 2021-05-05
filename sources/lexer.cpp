@@ -105,18 +105,30 @@ std::string Lexer::get_str()
         });
 }
 
+std::string Lexer::get_operand()
+{
+    get_till([](char c, bool is_first) {
+        return (c == ' ') or (c == '\t');
+    });
+
+    return get_till(
+        [this](char c, bool is_first){
+            return (this->tokens.find(c) == this->tokens.end());
+        });
+}
+
 bool Lexer::is_eot(const std::string &str)
 {
     return EOT_sign == str;
 }
 
-Token Lexer::get_token()
+Token Lexer::get_token(bool spaceless)
 {
     const char *begin = text_ptr;
     if(tokens.find(*begin) == tokens.end()) {
         return Token {
             Token_type::String,
-            get_str()
+            spaceless ? get_operand() : get_str()
         };
     } else {
         ++text_ptr;
