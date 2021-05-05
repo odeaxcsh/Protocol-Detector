@@ -33,24 +33,25 @@ Protocol::Protocol(const Json::Value &value) : requirements(3)
   this->layer = value["layer"].asInt();
   std::string &&pattern = value["pattern"].asString();
   std::string &&ignores = value["pattern-ignores"].asString();
-
   std::map<std::string, std::string> escapes = {{"\\n", "\n"}, {"\\r", "\r"}, {"\\t", "\t"}};
 
   for(auto [c, e] : escapes)
       ignores = std::regex_replace(ignores, std::regex(c), e);
 
   pattern.erase(std::remove_if(pattern.begin(), pattern.end(),
-                      [&ignores](char c) {
-                          return ignores.find(c) != std::string::npos;
-                      }),
-                      pattern.end()
-                );
+		[&ignores](char c) {
+			return ignores.find(c) != std::string::npos;
+		}),
+		pattern.end()
+	);
 
   for(auto [c, e] : escapes)
     pattern = std::regex_replace(pattern, std::regex(c), e);
 
   Lexer lexer = (pattern.c_str());
   this->pattern = Pattern_parser(lexer).parse();
+
+  this->size = Formula_parser().parse<int>(value["size"].asString());
 
   for(auto object : value["requirements"])
     for(auto value : object["protocols"])
@@ -78,8 +79,12 @@ std::tuple<matched_packet &, bool> Protocol::match(std::vector<unsigned char> &p
   auto variables = vm.run(packet, len, matched.index);
   if(variables.find("Failed") != variables.end())
     return {matched, false};
+  
+  if(this->size != nullptr)
+    matched.index.byte += size->eval(variables);
+  else
+    matched.index = vm.get_last_index();
 
-  matched.index = vm.get_last_index();
   matched_protocol protocol;
   protocol.variables = variables;
   protocol.matched_protocol = this->name;
