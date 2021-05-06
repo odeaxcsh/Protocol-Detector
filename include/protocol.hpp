@@ -32,7 +32,7 @@ private:
   int id;
   int layer;
   std::vector<std::vector<std::string>> requirements;
-  std::vector<Base_expression<bool>*> conditions;
+  std::vector<std::vector<Base_expression<int>*>> conditions;
 
   Base_expression<int> *size;
 

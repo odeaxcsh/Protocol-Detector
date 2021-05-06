@@ -2,7 +2,7 @@
 #include "lexer.hpp"
 #include "pattern_parser.hpp"
 #include "virtual_machine.hpp"
-
+#include "elicitation_utils.hpp"
 
 #include <regex>
 #include <algorithm>
@@ -26,7 +26,7 @@ Protocol Protocol::from_file(const std::string &path)
   return (Protocol(json));
 }
 
-Protocol::Protocol(const Json::Value &value) : requirements(3)
+Protocol::Protocol(const Json::Value &value) : requirements(3), conditions(4)
 {
   this->id = ++id_generator_core;
   this->name = value["name"].asString();
@@ -58,6 +58,13 @@ Protocol::Protocol(const Json::Value &value) : requirements(3)
       this->requirements[object["layer"].asInt() - 1]
         .push_back(value.asString());
 
+  for(auto object : value["conditions"])
+    for(auto value : object["conditions"])
+      this->conditions[object["layer"].asInt() - 1]
+        .push_back(
+          Formula_parser().parse<int>(value.asString())
+        );
+
   this->protocol_mapper[name] = this;
 }
 
@@ -75,11 +82,23 @@ std::tuple<matched_packet &, bool> Protocol::match(std::vector<unsigned char> &p
       return {matched, false};
   }
 
+  for(int i = 0; i < matched.layer_count - 1; ++i) {
+    for(auto condition : conditions[i]) {
+      if(not condition->eval(matched.protocols[i].variables))
+        return {matched, false};
+    }
+  }
+
   VM vm(this->pattern);
   auto variables = vm.run(packet, len, matched.index);
   if(variables.find("Failed") != variables.end())
     return {matched, false};
   
+  for(auto condition : conditions[matched.layer_count - 1]) {
+    if(not condition->eval(matched.protocols[matched.layer_count - 1].variables))
+      return {matched, false};
+  }
+
   if(this->size != nullptr)
     matched.index.byte += size->eval(variables);
   else
