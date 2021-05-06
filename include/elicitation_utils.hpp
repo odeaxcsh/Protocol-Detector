@@ -134,9 +134,9 @@ public:
     using Int_Mul = Binary_operator<int, int, +[](int a, int b)->int { return a * b; }>;
     using Int_Div = Binary_operator<int, int, +[](int a, int b)->int { return  a / b; }>;
 
-    using Int_EQ = Binary_operator<bool, int, +[](int a, int b)->bool { return a == b; }>;
-    using Int_Le = Binary_operator<bool, int, +[](int a, int b)->bool { return a < b; }>;
-    using Int_Gr = Binary_operator<bool, int, +[](int a, int b)->bool { return b < a; }>;
+    using Int_EQ = Binary_operator<int, int, +[](int a, int b)->int { return a == b; }>;
+    using Int_Le = Binary_operator<int, int, +[](int a, int b)->int { return a < b; }>;
+    using Int_Gr = Binary_operator<int, int, +[](int a, int b)->int { return b < a; }>;
 
     const static std::map<char, Token_type> defalut_operators;
     const static std::map<Token_type, int> priority;

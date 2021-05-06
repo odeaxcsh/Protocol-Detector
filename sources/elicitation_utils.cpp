@@ -44,7 +44,10 @@ const std::map<char, Token_type> Formula_parser::defalut_operators =
     {'+', Token_type::Sum_op},
     {'/', Token_type::Div_op},
     {')', Token_type::Close_paran},
-    {'(', Token_type::Open_paran}
+    {'(', Token_type::Open_paran},
+    {'<', Token_type::Les_op},
+    {'>', Token_type::gre_op},
+    {'=', Token_type::eq_op},
 };
 
 const std::map<Token_type, int> Formula_parser::priority = 
@@ -52,7 +55,10 @@ const std::map<Token_type, int> Formula_parser::priority =
     {Token_type::Div_op, 1},
     {Token_type::Mul_op, 1},
     {Token_type::Sum_op, 2},
-    {Token_type::Open_paran, 3},
+    {Token_type::Les_op, 3},
+    {Token_type::eq_op, 3},
+    {Token_type::gre_op, 3},
+    {Token_type::Open_paran, 4},
 };
 
 template<typename dtype>
@@ -95,6 +101,18 @@ Base_expression<int> *Formula_parser::parse(std::string expression) const
 
             case Token_type::Sum_op:
                 vars_stack.push(new Formula_parser::Int_Sum(a, b));
+                break;
+
+            case Token_type::gre_op:
+                vars_stack.push(new Formula_parser::Int_Gr(a, b));
+                break;
+
+            case Token_type::eq_op:
+                vars_stack.push(new Formula_parser::Int_EQ(a, b));
+                break;
+
+            case Token_type::Les_op:
+                vars_stack.push(new Formula_parser::Int_Le(a, b));
                 break;
 
             default:
