@@ -55,6 +55,51 @@ namespace {
         EXPECT_EQ(value, 20);
     }
 
+    TEST(Elicitation, equality)
+    {
+        std::string expr = "(a = b)";
+        
+        auto parser = Formula_parser();
+        auto compiled = parser.parse<int>(expr);
+        var_t var1 = {{"a", {10}}, {"b", {5}}};
+        var_t var2 = {{"a", {5}}, {"b", {5}}};
+
+        auto value1 = compiled->eval(var1);
+        auto value2 = compiled->eval(var2);
+        EXPECT_EQ(value1, 0);
+        EXPECT_EQ(value2, 1);
+    }
+
+    TEST(Elicitation, less)
+    {
+        std::string expr = "(a < b)";
+        
+        auto parser = Formula_parser();
+        auto compiled = parser.parse<int>(expr);
+        var_t var1 = {{"a", {6}}, {"b", {5}}};
+        var_t var2 = {{"a", {5}}, {"b", {6}}};
+
+        auto value1 = compiled->eval(var1);
+        auto value2 = compiled->eval(var2);
+        EXPECT_EQ(value1, 0);
+        EXPECT_EQ(value2, 1);
+    }
+
+    TEST(Elicitation, greater)
+    {
+        std::string expr = "(a > b)";
+        
+        auto parser = Formula_parser();
+        auto compiled = parser.parse<int>(expr);
+        var_t var1 = {{"a", {6}}, {"b", {5}}};
+        var_t var2 = {{"a", {5}}, {"b", {6}}};
+
+        auto value1 = compiled->eval(var1);
+        auto value2 = compiled->eval(var2);
+        EXPECT_EQ(value1, 1);
+        EXPECT_EQ(value2, 0);
+    }
+
     TEST(Elicitation, combined_int)
     {
         std::string expr = "(a + b) * c";
@@ -77,5 +122,17 @@ namespace {
         auto value = compiled->eval(var);
         
         EXPECT_EQ(value, 56);
+    }
+
+    TEST(Elicitation, complex_bool)
+    {
+        std::string expr = "(a + b) * (c + d) = a*c + a*d + b*c + b*d";
+        var_t var = {{"a", {8}}, {"b", {1}}, {"c", {10}}, {"d", {12}}};
+        
+        auto parser = Formula_parser();
+        auto compiled = parser.parse<int>(expr);
+        auto value = compiled->eval(var);
+        
+        EXPECT_EQ(value, 1);
     }
 };
