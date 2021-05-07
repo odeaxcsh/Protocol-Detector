@@ -109,6 +109,7 @@ std::map<std::string, std::vector<unsigned char>> VM::run(std::vector<unsigned c
 
             case Opcode::Add_iterate:
                 add_iterate(state);
+                queue = {};
                 break;
 
             default:
