@@ -2,63 +2,65 @@
 #include "virtual_machine.hpp"
 #include "protocol.hpp"
 #include "elicitation_utils.hpp"
-
+#include "file_manager.hpp"
+#include "printer_class.hpp"
 #include <iostream>
 #include <json/json.h>
 #include "tins/tins.h"
 using namespace Tins;
 
-std::ostream& operator<<(std::ostream& out, std::vector<unsigned char> str)
+class Matcher
 {
-    for(auto x : str) {
-        out << (int)x;
+public:
+  Matcher(const std::string &path, int count_limit)
+  {
+    File_manager files(path);
+    protocols =  files.get_protocols();
+    layers_count = protocols.size();
+    this->count_limit = count_limit;
+    count = 0;
+  }
+
+  void run()
+  {
+    Sniffer sniffer("wlp3s0");
+    sniffer.sniff_loop(make_sniffer_handler(this, &Matcher::handle));
+  }
+
+  bool handle(PDU& pdu)
+  {
+    EthernetII packet = pdu.rfind_pdu<EthernetII>();
+    std::vector<unsigned char> vec = static_cast<std::vector<unsigned char>>(packet.serialize());
+    matched_packet p;
+
+    for(int layer = 0; layer < layers_count; ++layer) {
+      for(auto protocol : protocols[layer]) {
+        if(auto [variables, matched] = protocol.match(vec, vec.size(), p); matched == true)
+          break;
+      }
     }
-    return out;
-}
 
-bool callback(const PDU &pdu) {
-  const IP &x = pdu.rfind_pdu<IP>(); // non-const works as well
-  std::cout << "Destination address: " << x.dst_addr() << std::endl;
-  const TCP &y = pdu.rfind_pdu<TCP>();
-  std::cout << "POrt" << y.sport() << " " << y.dport() << std::endl;
+    count += printer.update(p);
+    return count < count_limit;
+  }
 
-  EthernetII packet = pdu.rfind_pdu<EthernetII>();
-  RawPDU raw = pdu.rfind_pdu<RawPDU>();
-
-  PDU::serialization_type buffer = packet.serialize();
-  Protocol ethernet = Protocol::from_file("/home/sophie/Desktop/network_intership_phistaz-rayanesh/p3-advanced/configurations/Ethernet.conf");
-  Protocol ip = Protocol::from_file("/home/sophie/Desktop/network_intership_phistaz-rayanesh/p3-advanced/configurations/IP.conf");
-  Protocol tcp = Protocol::from_file("/home/sophie/Desktop/network_intership_phistaz-rayanesh/p3-advanced/configurations/TCP.conf");
-  Protocol http = Protocol::from_file("/home/sophie/Desktop/network_intership_phistaz-rayanesh/p3-advanced/configurations/HTTP.conf");
-
-  auto vec = static_cast<std::vector<unsigned char>>(buffer);
-  matched_packet p;
-  auto [a, b] = ethernet.match(vec, vec.size(), p);
-  auto [ia, ib] = ip.match(vec, vec.size(), a);
-  auto [ta, tb] = tcp.match(vec, vec.size(), ia);
-  auto [ha, hb] = http.match(vec, vec.size(), ta);
-
-  std::cout << buffer << std::endl;
-  std::cout << b << ib << tb << hb << std::endl;
-
-  for(auto [key, value] : ia.protocols[0].variables)
-    std::cout << key << ": " << value << std::endl;
-
-  for(auto [key, value] : ia.protocols[1].variables)
-      std::cout << key << ": " << value << std::endl;
-
-  for(auto [key, value] : ia.protocols[2].variables)
-      std::cout << key << ": " << value << std::endl;
-
-  for(auto [key, value] : ia.protocols[3].variables)
-      std::cout << key << ": " << value << std::endl;
-
-  return false;
-}
+private:
+  std::vector<std::vector<Protocol>> protocols;
+  Printer printer;
+  int layers_count;
+  int count_limit;
+  int count;
+};
 
 int main(int argc, char *argv[])
 {
-  auto x = Sniffer("wlp3s0");
-  x.set_filter("tcp.src_port==80");
-  x.sniff_loop(callback);
+  if(argc < 3) {
+    throw "Invalid input\n usage: <packet_count: int> <main configuration file path: str>";
+  }
+
+  std::string path = argv[2];
+  int count_limit = std::stoi(argv[1]);
+
+  Matcher matcher(path, count_limit);
+  matcher.run();
 }
