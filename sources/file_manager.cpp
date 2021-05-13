@@ -44,12 +44,24 @@ std::vector<std::vector<Protocol>> File_manager::get_protocols()
 {
     std::vector<std::vector<Protocol>> protocols_object;
     for(auto path : protocols) {
-        Protocol protocol = Protocol::from_file(path);
-        int layer = protocol.get_layer();
-        if(protocols_object.size() < layer)
-            protocols_object.resize(layer);
+        auto json = open_json_file(path);
+        if(json.isArray()) {
+            for(auto protocol : json) {
+                Protocol protocol_object{protocol};
+                int layer = protocol_object.get_layer();
+                if(protocols_object.size() < layer)
+                    protocols_object.resize(layer);
 
-        protocols_object[layer-1].push_back(protocol);
+                protocols_object[layer-1].push_back(protocol_object);
+            }
+        } else {
+            Protocol protocol_object{json};
+            int layer = protocol_object.get_layer();
+            if(protocols_object.size() < layer)
+                protocols_object.resize(layer);
+
+            protocols_object[layer-1].push_back(protocol_object);
+        }
     }
     return protocols_object;
 }
