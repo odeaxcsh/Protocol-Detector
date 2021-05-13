@@ -55,7 +55,7 @@ namespace
             {Opcode::Jump, {"0"}},
 
             // main
-            {Opcode::Split, {"-1", "1"}},
+            {Opcode::Split, {"1", "-1"}},
             {Opcode::Split, {"1", "-2"}},
         };
 
