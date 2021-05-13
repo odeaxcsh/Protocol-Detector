@@ -63,7 +63,7 @@ std::map<std::string, std::vector<unsigned char>> VM::run(std::vector<unsigned c
     this->queue.push(initial_state);
 
     while(!queue.empty()) {
-        machine_state state = queue.front();
+        machine_state state = queue.top();
         Bytecode instruction;
 
         if(state.pc < this->code.size())
@@ -73,7 +73,7 @@ std::map<std::string, std::vector<unsigned char>> VM::run(std::vector<unsigned c
         if(instruction.opcode == Opcode::Return)
             break;
         else if(instruction.opcode == Opcode::Halt) {
-            ++(queue.front().pc);
+            ++(queue.top().pc);
             continue;
         }
 
@@ -125,7 +125,7 @@ std::map<std::string, std::vector<unsigned char>> VM::run(std::vector<unsigned c
         return {{"Failed", {}}};
     }
 
-    machine_state state = queue.front();
+    machine_state state = queue.top();
     std::map<std::string, std::vector<unsigned char>> result;
     std::vector<std::string> iterations;
     last_match = state.index;

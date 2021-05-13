@@ -10,7 +10,7 @@ Printer::Printer()
 int Printer::update(const matched_packet &packet)
 {
     if(packet.layer_count == 5) {
-        std::cout << "HTTP packet detected!" << std::endl;
+        std::cout << packet.protocols[3].matched_protocol << " packet detected!" << std::endl;
         for(auto [key, value] : packet.protocols[3].variables) {
             std::string str_value;
             std::transform(value.begin(), value.end(), std::back_inserter(str_value), [](unsigned c) { return static_cast<unsigned char> (c); });

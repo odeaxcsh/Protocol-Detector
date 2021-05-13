@@ -31,7 +31,7 @@ public:
   {
     EthernetII packet = pdu.rfind_pdu<EthernetII>();
     std::vector<unsigned char> vec = static_cast<std::vector<unsigned char>>(packet.serialize());
-    matched_packet p;
+    matched_packet p = {};
 
     for(int layer = 0; layer < layers_count; ++layer) {
       for(auto protocol : protocols[layer]) {

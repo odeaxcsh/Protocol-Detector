@@ -6,7 +6,7 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <queue>
+#include <stack>
 #include <utility>
 
 typedef struct {
@@ -68,7 +68,7 @@ private:
     std::vector<unsigned char> text;
     int length = 0;
 
-    std::queue<machine_state> queue;
+    std::stack<machine_state> queue;
     const static std::string counter_name;
 };
 
