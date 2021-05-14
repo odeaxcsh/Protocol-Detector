@@ -51,8 +51,8 @@ private:
 
         int pc = 0;
 
-        std::map<std::string, Index> var_starts;
-        std::map<std::string, Index> var_ends;
+        std::map<std::string, std::vector<unsigned char>> variables;
+        std::map<std::string, Index> vars_last_update;
 
         std::map<std::string, int> iteration_counter;
     } machine_state;

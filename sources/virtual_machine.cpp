@@ -10,7 +10,7 @@ int i_th_bit(unsigned char value, int pos)
     return (value >> pos) & (1);
 }
 
-const std::string VM::counter_name = "X";
+const std::string VM::counter_name = "__iteration_couter";
 
 std::vector<unsigned char> to_string(Index start, Index end, const std::vector<unsigned char> &text)
 {
@@ -129,19 +129,19 @@ std::map<std::string, std::vector<unsigned char>> VM::run(std::vector<unsigned c
     std::map<std::string, std::vector<unsigned char>> result;
     std::vector<std::string> iterations;
     last_match = state.index;
-
+    result = state.variables;
+/*
     for(const auto &[key, value] : state.var_starts) {
-        /*
         if((key.length() > counter_name.length()) and
             (0 == key.compare(key.length() - counter_name.length(), counter_name.length(), counter_name)))
             continue;
-        */
+        
         const auto end = state.var_ends.find(key);
         if(end != state.var_ends.end()) {
             result[key] = (to_string(value, end->second, text));
         }
     }
-
+*/
     return result;
 }
 
@@ -217,15 +217,35 @@ void VM::split(machine_state &state)
 
 void VM::save_start(machine_state &state)
 {
-    Bytecode instruction = code[state.pc];
-    state.var_starts[instruction.args[0]] = state.index;
+    const std::string &var_name = code[state.pc].args[0];
+    state.vars_last_update[var_name] = state.index;
+    state.variables[var_name] = {};
     ++state.pc;
 }
 
 void VM::save_end(machine_state &state)
 {
-    Bytecode instruction = code[state.pc];
-    state.var_ends[instruction.args[0]] = state.index;
+    const std::string &var_name = code[state.pc].args[0];
+    Index last_index = state.vars_last_update[var_name];
+    std::vector<unsigned char> &variable = state.variables[var_name];
+
+    if(not variable.empty()) {
+        auto &last_char = variable.back();
+        int update_bit = (state.index.byte == last_index.byte) ? state.index.bit : 7;
+
+        last_char = (last_char << (8 - update_bit)) | (text[state.index.byte] & (static_cast<unsigned char>(-1) >> update_bit));
+        last_index.bit = 0;
+        ++last_index.byte;
+    }
+
+    std::vector<unsigned char> just_added = to_string(
+        last_index,
+        state.index,
+        this->text
+    );
+
+    variable.insert(variable.end(), just_added.begin(), just_added.end());
+    state.vars_last_update[var_name] = state.index;
     ++state.pc;
 }
 
@@ -233,12 +253,20 @@ void VM::add_iterate(machine_state &state)
 {
     Bytecode instruction = code[state.pc];
 
+    auto get_iteration_couter = [this](int pc) {
+        return this->counter_name + " of code at" + std::to_string(pc);
+    };
+
+    if(state.iteration_counter.find(get_iteration_couter(state.pc)) == state.iteration_counter.end())
+        state.iteration_counter[get_iteration_couter(state.pc)] = 0;
+    
+    ++state.iteration_counter[get_iteration_couter(state.pc)];
+    
     //returns index of where variable iteration counter placed
     
     auto get_item_name = [this](const std::string &name, int count) -> std::string {
         return name + "[" + std::to_string(count) + "]";
     };
-    
 
     //Set counters at VAR STARTS NAME
     for(const auto &name : instruction.args) {
@@ -248,9 +276,9 @@ void VM::add_iterate(machine_state &state)
         
         std::string this_item_name = get_item_name(name, counter);
 
-        state.var_starts[this_item_name] = state.var_starts[name];
-        state.var_ends[this_item_name] = state.var_ends[name];
-        state.var_starts.erase(name);
+        state.variables[this_item_name] = state.variables[name];
+        state.vars_last_update.erase(name);
+        state.variables.erase(name);
 
         state.iteration_counter[name] = counter + 1;
     }
