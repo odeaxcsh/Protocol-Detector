@@ -95,6 +95,12 @@ Pattern Code_generation_utils::execute_iteration(const Pattern &matches_pattern,
         limit_expr,
     });
 
+    if(limit_expr != "")
+        result.push_back(new Bytecode{
+            Opcode::Match,
+            {NOTHING_STRING}
+        });
+
     result.push_back(new Bytecode {
         Opcode::Split,
         {to_string(-matches_pattern_length - 1), to_string(1)}

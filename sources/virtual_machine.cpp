@@ -152,6 +152,10 @@ bool VM::match(machine_state &state)
 
     Bytecode instruction = *code[state.pc];
 
+    if(instruction.args[0] == NOTHING_STRING) {
+        return false;
+    }
+    
     if(ibit != 0) {
         throw std::runtime_error("Bit index must be zero on string matching");
     }

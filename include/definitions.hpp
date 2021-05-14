@@ -9,6 +9,7 @@
 #define ITERATION_STOP_SIGN '>'
 
 #define ANY_STRING "ANY"
+#define NOTHING_STRING "NOTHING"
 
 #include <string>
 #include <algorithm>

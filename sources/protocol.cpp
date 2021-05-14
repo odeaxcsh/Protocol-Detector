@@ -33,7 +33,7 @@ Protocol::Protocol(const Json::Value &value) : requirements(3), conditions(4)
   this->layer = value["layer"].asInt();
   std::string &&pattern = value["pattern"].asString();
   std::string &&ignores = value["pattern-ignores"].asString();
-  std::map<std::string, std::string> escapes = {{R"(\\n)", "\n"}, {R"(\\r)", "\r"}, {R"(\\t)", "\t"}};
+  std::map<std::string, std::string> escapes = {{R"(\\n)", "\n"}, {R"(\\r)", "\r"}, {R"(\\t)", "\t"}, {R"(\\0)", "\0"}};
 
   for(auto [c, e] : escapes)
       ignores = std::regex_replace(ignores, std::regex(c), e);
