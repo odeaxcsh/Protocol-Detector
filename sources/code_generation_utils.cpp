@@ -6,10 +6,10 @@
 
 struct Code_generation_utils code_generation_utils;
 
-Bytecode Code_generation_utils::match_any_char()
+Bytecode *Code_generation_utils::match_any_char()
 {
     using std::to_string;
-    return Bytecode {
+    return new Bytecode {
         Opcode::Match,
         {ANY_STRING, to_string(1)}
     };
@@ -19,14 +19,14 @@ Pattern Code_generation_utils::match_binary_pattern(const std::string &str)
 {
     if(str[0] == 'b') {
         return {
-            Bytecode {
+            new Bytecode {
                 Opcode::Bit_match,
                 {str}
             }
         };
     } else if(is_number(str)) {
         return {
-                Bytecode{
+                new Bytecode {
                 Opcode::Bit_match,
                 {ANY_STRING, str}
             }
@@ -42,14 +42,14 @@ Pattern Code_generation_utils::match_string_pattern(const std::string &str)
         return any_string_pattern();
     } else if(is_number(str)) {
         return {
-            Bytecode {
+            new Bytecode {
                 Opcode::Match,
                 {ANY_STRING, str}
             }
         };
     } else {
         return {
-                Bytecode{
+                new Bytecode {
                 Opcode::Match,
                 {str}
             }
@@ -65,21 +65,21 @@ Pattern Code_generation_utils::execute_kleene_star(const Pattern &matches_patter
     Pattern result;
     int matches_pattern_length = matches_pattern.size();
 
-    result.push_back(Bytecode{
+    result.push_back(new Bytecode {
         Opcode::Split,
         {to_string(matches_pattern_length + 2), to_string(1)}
     });
 
     result.insert(end(result), begin(matches_pattern), end(matches_pattern));
 
-    result.push_back(Bytecode{
+    result.push_back(new Bytecode {
         Opcode::Jump,
         {to_string( -(matches_pattern_length + 1))}
     });
     return result;
 }
 
-Pattern Code_generation_utils::execute_iteration(const Pattern &matches_pattern, const std::vector<std::string> &names)
+Pattern Code_generation_utils::execute_iteration(const Pattern &matches_pattern, const std::vector<std::string> &names, const std::string &limit_expr)
 {
     using std::end, std::begin;
     using std::to_string;
@@ -89,12 +89,13 @@ Pattern Code_generation_utils::execute_iteration(const Pattern &matches_pattern,
 
     result.insert(end(result), begin(matches_pattern), end(matches_pattern));
 
-    result.push_back(Bytecode{
+    result.push_back(new Bytecode_add_iterate{
         Opcode::Add_iterate,
-        names
+        names,
+        limit_expr,
     });
 
-    result.push_back(Bytecode{
+    result.push_back(new Bytecode {
         Opcode::Split,
         {to_string(-matches_pattern_length - 1), to_string(1)}
     });
@@ -118,14 +119,14 @@ Pattern Code_generation_utils::any_string_pattern()
     using std::to_string;
     Pattern result;
 
-    result.push_back(Bytecode{
+    result.push_back(new Bytecode {
         Opcode::Split,
         {to_string(3), to_string(1)}
     });
 
     result.push_back(match_any_char());
 
-    result.push_back(Bytecode{
+    result.push_back(new Bytecode {
         Opcode::Jump,
         {to_string(-2)}
     });
@@ -141,14 +142,14 @@ Pattern Code_generation_utils::execute_or_operator(const Pattern &first, const P
     Pattern result;
     int first_length = first.size(), second_length = second.size();
 
-    result.push_back(Bytecode{
+    result.push_back(new Bytecode {
         Opcode::Split,
         {to_string(1), to_string(first_length + 2)}
     });
 
     result.insert(end(result), begin(first), end(first));
 
-    result.push_back(Bytecode{
+    result.push_back(new Bytecode {
         Opcode::Jump,
         {to_string(second_length + 1)}
     });
@@ -163,14 +164,14 @@ Pattern Code_generation_utils::execute_save_variable(const Pattern &match_patter
     using std::end, std::begin;
     Pattern result;
 
-    result.push_back(Bytecode{
+    result.push_back(new Bytecode {
         Opcode::Save_start,
         {name}
     });
 
     result.insert(end(result), begin(match_pattern), end(match_pattern));
 
-    result.push_back(Bytecode{
+    result.push_back(new Bytecode {
         Opcode::Save_end,
         {name}
     });

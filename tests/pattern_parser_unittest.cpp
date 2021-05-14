@@ -14,10 +14,10 @@ namespace {
         Pattern result = Pattern_parser(lexer).parse();
 
         Pattern expected = {
-            {Opcode::Split, {"1", "3"}},
-            {Opcode::Match, {"THIS"}},
-            {Opcode::Jump, {"2"}},
-            {Opcode::Match, {"THAT"}},
+            new Bytecode{Opcode::Split, {"1", "3"}},
+            new Bytecode{Opcode::Match, {"THIS"}},
+            new Bytecode{Opcode::Jump, {"2"}},
+            new Bytecode{Opcode::Match, {"THAT"}},
         };
 
         EXPECT_EQ(expected, result);
@@ -30,10 +30,10 @@ namespace {
         Pattern result = Pattern_parser(lexer).parse();
 
         Pattern expected = {
-            {Opcode::Split, {"3", "1"}},
-            {Opcode::Match, {ANY_STRING, "1"}},
-            {Opcode::Jump, {"-2"}},
-            {Opcode::Match, {"."}}
+            new Bytecode{Opcode::Split, {"3", "1"}},
+            new Bytecode{Opcode::Match, {ANY_STRING, "1"}},
+            new Bytecode{Opcode::Jump, {"-2"}},
+            new Bytecode{Opcode::Match, {"."}}
         };
 
         EXPECT_EQ(expected, result);
@@ -46,11 +46,11 @@ namespace {
         Pattern result = Pattern_parser(lexer).parse();
 
         Pattern expected = {
-            {Opcode::Save_start, {"name"}},
-            {Opcode::Split, {"3", "1"}},
-            {Opcode::Match, {ANY_STRING, "1"}},
-            {Opcode::Jump, {"-2"}},
-            {Opcode::Save_end, {"name"}}
+            new Bytecode{Opcode::Save_start, {"name"}},
+            new Bytecode{Opcode::Split, {"3", "1"}},
+            new Bytecode{Opcode::Match, {ANY_STRING, "1"}},
+            new Bytecode{Opcode::Jump, {"-2"}},
+            new Bytecode{Opcode::Save_end, {"name"}}
         };
 
         EXPECT_EQ(expected, result);
@@ -63,21 +63,21 @@ namespace {
         Pattern result = Pattern_parser(lexer).parse();
 
         Pattern expected = {
-            {Opcode::Save_start, {"Protocol"}},
-            {Opcode::Split, {"1", "3"}},
-            {Opcode::Match, {"PUT"}},
-            {Opcode::Jump, {"2"}},
-            {Opcode::Match, {"GET"}},
-            {Opcode::Save_end, {"Protocol"}},
-            {Opcode::Match, {" on "}},
-            {Opcode::Save_start, {"version"}},
-            {Opcode::Split, {"1", "3"}},
-            {Opcode::Match, {"1.1"}},
-            {Opcode::Jump, {"2"}},
-            {Opcode::Match, {"1.2"}},
-            {Opcode::Save_end, {"version"}},
-            {Opcode::Add_iterate, {"Protocol", "version"}},
-            {Opcode::Split, {"-14", "1"}}
+            new Bytecode{Opcode::Save_start, {"Protocol"}},
+            new Bytecode{Opcode::Split, {"1", "3"}},
+            new Bytecode{Opcode::Match, {"PUT"}},
+            new Bytecode{Opcode::Jump, {"2"}},
+            new Bytecode{Opcode::Match, {"GET"}},
+            new Bytecode{Opcode::Save_end, {"Protocol"}},
+            new Bytecode{Opcode::Match, {" on "}},
+            new Bytecode{Opcode::Save_start, {"version"}},
+            new Bytecode{Opcode::Split, {"1", "3"}},
+            new Bytecode{Opcode::Match, {"1.1"}},
+            new Bytecode{Opcode::Jump, {"2"}},
+            new Bytecode{Opcode::Match, {"1.2"}},
+            new Bytecode{Opcode::Save_end, {"version"}},
+            new Bytecode{Opcode::Add_iterate, {"Protocol", "version"}},
+            new Bytecode{Opcode::Split, {"-14", "1"}}
         };
 
         EXPECT_EQ(expected, result);
@@ -90,13 +90,13 @@ namespace {
         Pattern result = Pattern_parser(lexer).parse();
 
         Pattern expected = {
-            {Opcode::Split, {"6", "1"}},
-            {Opcode::Split, {"1", "3"}},
-            {Opcode::Match, {"A"}},
-            {Opcode::Jump, {"2"}},
-            {Opcode::Match, {"B"}},
-            {Opcode::Jump, {"-5"}},
-            {Opcode::Match, {" !"}}
+            new Bytecode{Opcode::Split, {"6", "1"}},
+            new Bytecode{Opcode::Split, {"1", "3"}},
+            new Bytecode{Opcode::Match, {"A"}},
+            new Bytecode{Opcode::Jump, {"2"}},
+            new Bytecode{Opcode::Match, {"B"}},
+            new Bytecode{Opcode::Jump, {"-5"}},
+            new Bytecode{Opcode::Match, {" !"}}
         };
 
         EXPECT_EQ(expected, result);
@@ -109,10 +109,10 @@ namespace {
         Pattern result = Pattern_parser(lexer).parse();
 
         Pattern expected = {
-            {Opcode::Split, {"4", "1"}},
-            {Opcode::Bit_match, {"b10"}},
-            {Opcode::Bit_match, {"ANY", "32"}},
-            {Opcode::Jump, {"-3"}},
+            new Bytecode{Opcode::Split, {"4", "1"}},
+            new Bytecode{Opcode::Bit_match, {"b10"}},
+            new Bytecode{Opcode::Bit_match, {"ANY", "32"}},
+            new Bytecode{Opcode::Jump, {"-3"}},
         };
 
         EXPECT_EQ(expected, result);
@@ -125,14 +125,14 @@ namespace {
         Pattern result = Pattern_parser(lexer).parse();
 
         Pattern expected = {
-            {Opcode::Save_start, {"binary1"}},
-            {Opcode::Bit_match, {"b10"}},
-            {Opcode::Save_end, {"binary1"}},
-            {Opcode::Save_start, {"binary2"}},
-            {Opcode::Bit_match, {"ANY", "32"}},
-            {Opcode::Save_end, {"binary2"}},
-            {Opcode::Add_iterate, {"binary1", "binary2"}},
-            {Opcode::Split, {"-7", "1"}}
+            new Bytecode{Opcode::Save_start, {"binary1"}},
+            new Bytecode{Opcode::Bit_match, {"b10"}},
+            new Bytecode{Opcode::Save_end, {"binary1"}},
+            new Bytecode{Opcode::Save_start, {"binary2"}},
+            new Bytecode{Opcode::Bit_match, {"ANY", "32"}},
+            new Bytecode{Opcode::Save_end, {"binary2"}},
+            new Bytecode{Opcode::Add_iterate, {"binary1", "binary2"}},
+            new Bytecode{Opcode::Split, {"-7", "1"}}
         };
 
         EXPECT_EQ(expected, result);

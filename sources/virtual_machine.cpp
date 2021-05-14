@@ -64,15 +64,15 @@ std::map<std::string, std::vector<unsigned char>> VM::run(std::vector<unsigned c
 
     while(!queue.empty()) {
         machine_state state = queue.top();
-        Bytecode instruction;
+        Bytecode *instruction;
 
         if(state.pc < this->code.size())
             instruction = this->code[state.pc];
         else break;
 
-        if(instruction.opcode == Opcode::Return)
+        if(instruction->opcode == Opcode::Return)
             break;
-        else if(instruction.opcode == Opcode::Halt) {
+        else if(instruction->opcode == Opcode::Halt) {
             ++(queue.top().pc);
             continue;
         }
@@ -80,7 +80,7 @@ std::map<std::string, std::vector<unsigned char>> VM::run(std::vector<unsigned c
         queue.pop();
 
         bool failed = false;
-        switch (instruction.opcode) {
+        switch (instruction->opcode) {
             case Opcode::Match:
                 if(not match(state))
                     failed = true;
@@ -108,7 +108,7 @@ std::map<std::string, std::vector<unsigned char>> VM::run(std::vector<unsigned c
                 break;
 
             case Opcode::Add_iterate:
-                add_iterate(state);
+                dynamic_cast<Bytecode_add_iterate*>(instruction)->execute(state);
                 queue = {};
                 break;
 
@@ -150,7 +150,7 @@ bool VM::match(machine_state &state)
     int ibit = state.index.bit,
         ibyte = state.index.byte;
 
-    Bytecode instruction = code[state.pc];
+    Bytecode instruction = *code[state.pc];
 
     if(ibit != 0) {
         throw std::runtime_error("Bit index must be zero on string matching");
@@ -179,7 +179,7 @@ bool VM::match(machine_state &state)
 bool VM::bit_match(machine_state &state)
 {
     Index index = state.index;
-    Bytecode instruction = code[state.pc];
+    Bytecode instruction = *code[state.pc];
 
     bool any = (instruction.args[0] == ANY_STRING);
     int len = any ? std::stoi(instruction.args[1]) : instruction.args[0].size() - 1;
@@ -202,14 +202,14 @@ bool VM::bit_match(machine_state &state)
 
 void VM::jump(machine_state &state)
 {
-    Bytecode instruction = code[state.pc];
+    Bytecode instruction = *code[state.pc];
     state.pc = state.pc + std::stoi(instruction.args[0]);
 }
 
 void VM::split(machine_state &state)
 {
     machine_state new_thread = state;
-    Bytecode instruction = code[state.pc];
+    Bytecode instruction = *code[state.pc];
     new_thread.pc = state.pc + std::stoi(instruction.args[1]);
     state.pc = state.pc + std::stoi(instruction.args[0]);
     queue.push(new_thread);
@@ -217,7 +217,7 @@ void VM::split(machine_state &state)
 
 void VM::save_start(machine_state &state)
 {
-    const std::string &var_name = code[state.pc].args[0];
+    const std::string &var_name = (*code[state.pc]).args[0];
     state.vars_last_update[var_name] = state.index;
     state.variables[var_name] = {};
     ++state.pc;
@@ -225,7 +225,7 @@ void VM::save_start(machine_state &state)
 
 void VM::save_end(machine_state &state)
 {
-    const std::string &var_name = code[state.pc].args[0];
+    const std::string &var_name = (*code[state.pc]).args[0];
     Index last_index = state.vars_last_update[var_name];
     std::vector<unsigned char> &variable = state.variables[var_name];
 
@@ -246,42 +246,5 @@ void VM::save_end(machine_state &state)
 
     variable.insert(variable.end(), just_added.begin(), just_added.end());
     state.vars_last_update[var_name] = state.index;
-    ++state.pc;
-}
-
-void VM::add_iterate(machine_state &state)
-{
-    Bytecode instruction = code[state.pc];
-
-    auto get_iteration_couter = [this](int pc) {
-        return this->counter_name + " of code at" + std::to_string(pc);
-    };
-
-    if(state.iteration_counter.find(get_iteration_couter(state.pc)) == state.iteration_counter.end())
-        state.iteration_counter[get_iteration_couter(state.pc)] = 0;
-    
-    ++state.iteration_counter[get_iteration_couter(state.pc)];
-    
-    //returns index of where variable iteration counter placed
-    
-    auto get_item_name = [this](const std::string &name, int count) -> std::string {
-        return name + "[" + std::to_string(count) + "]";
-    };
-
-    //Set counters at VAR STARTS NAME
-    for(const auto &name : instruction.args) {
-        int counter = 
-            state.iteration_counter.find(name) == state.iteration_counter.end() ? 
-            0 : state.iteration_counter[name];
-        
-        std::string this_item_name = get_item_name(name, counter);
-
-        state.variables[this_item_name] = state.variables[name];
-        state.vars_last_update.erase(name);
-        state.variables.erase(name);
-
-        state.iteration_counter[name] = counter + 1;
-    }
-
     ++state.pc;
 }

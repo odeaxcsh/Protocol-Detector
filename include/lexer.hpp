@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+class Lexer;
+
 #include "definitions.hpp"
 
 enum class Token_type {
@@ -50,6 +52,8 @@ public:
     std::string get_str();
     std::string get_name();
     std::string get_operand();
+    std::string get_expression();
+
     bool is_eot(const std::string &);
 
     Token get_token(bool=false);

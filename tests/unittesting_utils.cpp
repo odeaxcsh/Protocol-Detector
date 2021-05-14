@@ -18,7 +18,7 @@ bool operator== (const Pattern &first, const Pattern &second)
         return false;
   
     for(int i = 0; i < first.size(); ++i)
-        if(!(first[i] == second[i]))
+        if(!(*first[i] == *second[i]))
             return false;
     return true;
 }

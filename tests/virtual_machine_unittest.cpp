@@ -16,10 +16,10 @@ namespace
     TEST(VirtualMachine, Jump)
     {
         Pattern code = {
-            {Opcode::Jump, {"3"}},
-            {Opcode::Match, {"SOMETHING"}},
-            {Opcode::Jump, {"2"}},
-            {Opcode::Jump, {"-1"}},
+            new Bytecode{Opcode::Jump, {"3"}},
+            new Bytecode{Opcode::Match, {"SOMETHING"}},
+            new Bytecode{Opcode::Jump, {"2"}},
+            new Bytecode{Opcode::Jump, {"-1"}},
         };
 
         VM vm(code);
@@ -32,9 +32,9 @@ namespace
     TEST(VirtualMachine, Capturing)
     {
         Pattern code = {
-            {Opcode::Save_start, {"variable"}},
-            {Opcode::Match, {"ANY", "3"}},
-            {Opcode::Save_end, {"variable"}},
+            new Bytecode{Opcode::Save_start, {"variable"}},
+            new Bytecode{Opcode::Match, {"ANY", "3"}},
+            new Bytecode{Opcode::Save_end, {"variable"}},
         };
 
         VM vm(code);
@@ -49,14 +49,14 @@ namespace
     {
         Pattern code = {
             // Jump to main code
-            {Opcode::Jump, {"2"}},
+            new Bytecode{Opcode::Jump, {"2"}},
 
             // Loop section
-            {Opcode::Jump, {"0"}},
+            new Bytecode{Opcode::Jump, {"0"}},
 
             // main
-            {Opcode::Split, {"1", "-1"}},
-            {Opcode::Split, {"1", "-2"}},
+            new Bytecode{Opcode::Split, {"1", "-1"}},
+            new Bytecode{Opcode::Split, {"1", "-2"}},
         };
 
         VM vm(code);
@@ -68,9 +68,9 @@ namespace
     TEST(VirtualMachine, Return)
     {
         Pattern code = {
-            {Opcode::Halt, {}},
-            {Opcode::Return, {}},
-            {Opcode::Jump, {"-2"}},
+            new Bytecode{Opcode::Halt, {}},
+            new Bytecode{Opcode::Return, {}},
+            new Bytecode{Opcode::Jump, {"-2"}},
         };
 
         VM vm(code);
@@ -83,12 +83,12 @@ namespace
     TEST(VirtualMachine, Iteration)
     {
         Pattern code = {
-                {Opcode::Save_start, {"name"}},
-                {Opcode::Match, {"ANY", "2"}},
-                {Opcode::Save_end, {"name"}},
-                {Opcode::Add_iterate, {"name"}},
-                {Opcode::Split, {"-4", "1"}},
-                {Opcode::Match, {"."}}
+                new Bytecode{Opcode::Save_start, {"name"}},
+                new Bytecode{Opcode::Match, {"ANY", "2"}},
+                new Bytecode{Opcode::Save_end, {"name"}},
+                new Bytecode_add_iterate{Opcode::Add_iterate, {"name"}, ""},
+                new Bytecode{Opcode::Split, {"-4", "1"}},
+                new Bytecode{Opcode::Match, {"."}}
         };
 
         VM vm(code);
@@ -100,6 +100,24 @@ namespace
         EXPECT_THAT(output["name[2]"], ElementsAre('A', 'D'));
     }
 
+    TEST(VirtualMachine, LimitedIteration)
+    {
+        Pattern code = {
+                new Bytecode{Opcode::Save_start, {"name"}},
+                new Bytecode{Opcode::Match, {"ANY", "2"}},
+                new Bytecode{Opcode::Save_end, {"name"}},
+                new Bytecode_add_iterate{Opcode::Add_iterate, {"name"}, "2"},
+                new Bytecode{Opcode::Split, {"-4", "1"}},
+        };
+
+        VM vm(code);
+        auto output = vm.run("ABACAD.", 7);
+
+        EXPECT_EQ(output.size(), 2);
+        EXPECT_THAT(output["name[0]"], ElementsAre('A', 'B'));
+        EXPECT_THAT(output["name[1]"], ElementsAre('A', 'C'));
+    }
+
     TEST(ViraulMachine, Binary_matcher)
     {
         auto binary_to_char = [](std::string binary) {
@@ -107,12 +125,12 @@ namespace
         };
 
         Pattern code = {
-            {Opcode::Save_start, {"upper"}},
-            {Opcode::Bit_match, {"ANY", "4"}},
-            {Opcode::Save_end, {"upper"}},
-            {Opcode::Save_start, {"lower"}},
-            {Opcode::Bit_match, {"ANY", "4"}},
-            {Opcode::Save_end, {"lower"}},
+            new Bytecode{Opcode::Save_start, {"upper"}},
+            new Bytecode{Opcode::Bit_match, {"ANY", "4"}},
+            new Bytecode{Opcode::Save_end, {"upper"}},
+            new Bytecode{Opcode::Save_start, {"lower"}},
+            new Bytecode{Opcode::Bit_match, {"ANY", "4"}},
+            new Bytecode{Opcode::Save_end, {"lower"}},
         };
 
         VM vm(code);

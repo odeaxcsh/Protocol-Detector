@@ -33,7 +33,7 @@ namespace
 
         Protocol protocol(convert_to_json(rawJson));
         Pattern expected = {
-            {Opcode::Match, {"THIS IS A TEST"}}
+            new Bytecode{Opcode::Match, {"THIS IS A TEST"}}
         };
         std::vector<std::vector<std::string>> expected_req = {{}, {}, {}};
 

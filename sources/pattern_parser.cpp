@@ -117,14 +117,16 @@ Pattern Pattern_parser::iteration(bool itermatch)
                 break;
 
             case Token_type::Iteration_start: {
+                std::string limit_expr = lexer.get_expression();
+            
                 this_level = iteration(true);
                 std::vector<std::string> names;
-                for(const Bytecode &bytecode : this_level) {
-                    if(bytecode.opcode == Opcode::Save_start) {
-                        names.insert(names.end(), bytecode.args.begin(), bytecode.args.end());
+                for(const Bytecode *bytecode : this_level) {
+                    if(bytecode->opcode == Opcode::Save_start) {
+                        names.insert(names.end(), bytecode->args.begin(), bytecode->args.end());
                     }
                 }
-                this_level = names.empty() ?  code_generation_utils.execute_kleene_star(this_level) : code_generation_utils.execute_iteration(this_level, names);
+                this_level = names.empty() ?  code_generation_utils.execute_kleene_star(this_level) : code_generation_utils.execute_iteration(this_level, names, limit_expr);
             } break;
 
             case Token_type::String:

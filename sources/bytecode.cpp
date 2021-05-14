@@ -1,4 +1,5 @@
 #include "bytecode.hpp"
+#include "virtual_machine.hpp"
 
 #include <iostream>
 
@@ -31,3 +32,42 @@ const std::string opcodes_name_map[]
     "Return",
     "Halt",
 };
+
+void Bytecode_add_iterate::execute(machine_state &state)
+{
+    auto get_iteration_couter = [](int pc) {
+        return "__iterator_counter_" + std::to_string(pc);
+    };
+
+    int iteration_counter = 0;
+
+    if(state.iteration_counter.find(get_iteration_couter(state.pc)) != state.iteration_counter.end())
+        iteration_counter = state.iteration_counter[get_iteration_couter(state.pc)];
+
+    state.iteration_counter[get_iteration_couter(state.pc)] = iteration_counter + 1;
+    
+    //returns index of where variable iteration counter placed
+    auto get_item_name = [this](const std::string &name, int count) -> std::string {
+        return name + "[" + std::to_string(count) + "]";
+    };
+
+    //Set counters at VAR STARTS NAME
+    for(const auto &name : args) {
+        int counter = 
+            state.iteration_counter.find(name) == state.iteration_counter.end() ? 
+            0 : state.iteration_counter[name];
+        
+        std::string this_item_name = get_item_name(name, counter);
+
+        state.variables[this_item_name] = state.variables[name];
+        state.vars_last_update.erase(name);
+        state.variables.erase(name);
+
+        state.iteration_counter[name] = counter + 1;
+    }
+    
+    if(limit_expr != nullptr and limit_expr->eval({}) == iteration_counter + 1)
+        ++state.pc;
+    
+    ++state.pc;
+}

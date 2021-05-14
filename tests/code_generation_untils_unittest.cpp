@@ -11,18 +11,18 @@ namespace {
 
     TEST(CodeGenerator, match_any_char)
     {
-        Bytecode bytecode = code_generation_utils.match_any_char();
+        Bytecode *bytecode = code_generation_utils.match_any_char();
         Bytecode expected = {Opcode::Match, {ANY_STRING, to_string(1)}};
-        EXPECT_EQ(bytecode, expected);
+        EXPECT_EQ(*bytecode, expected);
     }
 
     TEST(CodeGenerator, any_string_pattern)
     {
         Pattern pattern = code_generation_utils.any_string_pattern();
         Pattern expected = {
-            {Opcode::Split, {to_string(3), to_string(1)}},
-            {Opcode::Match, {ANY_STRING, to_string(1)}},
-            {Opcode::Jump, {to_string(-2)}}
+            new Bytecode{Opcode::Split, {to_string(3), to_string(1)}},
+            new Bytecode{Opcode::Match, {ANY_STRING, to_string(1)}},
+            new Bytecode{Opcode::Jump, {to_string(-2)}}
         };
 
         EXPECT_EQ(expected, pattern);
@@ -30,11 +30,11 @@ namespace {
 
     TEST(CodeGenerator, concatanation)
     {
-        Pattern e1 = {Bytecode{Opcode::Match, {"e1"}}};
-        Pattern e2 = {Bytecode{Opcode::Match, {"e2"}}};
+        Pattern e1 = {new Bytecode{Opcode::Match, {"e1"}}};
+        Pattern e2 = {new Bytecode{Opcode::Match, {"e2"}}};
         Pattern expected = {
-            {Bytecode{Opcode::Match, {"e1"}}},
-            {Bytecode{Opcode::Match, {"e2"}}}
+            new Bytecode{Opcode::Match, {"e1"}},
+            new Bytecode{Opcode::Match, {"e2"}}
         };
 
         auto e1e2  = code_generation_utils.execute_concatanation_operator({e1, e2});
@@ -53,7 +53,7 @@ namespace {
         {
             int n = 5;
             Pattern expected = {
-                {Opcode::Match, {ANY_STRING, to_string(n)}}
+                new Bytecode{Opcode::Match, {ANY_STRING, to_string(n)}}
             };
             Pattern match_n_char = code_generation_utils.match_string_pattern(to_string(n));
 
@@ -61,7 +61,7 @@ namespace {
         }
         {
             Pattern expected = {
-                {Opcode::Match, {"A TEST"}}
+                new Bytecode{Opcode::Match, {"A TEST"}}
             };
 
             Pattern match_e1_or_e2 = code_generation_utils.match_string_pattern("A TEST");
@@ -74,14 +74,14 @@ namespace {
     {
         {
             int n = 5;
-            Pattern expected = {{Opcode::Bit_match, {ANY_STRING, to_string(n)}}};
+            Pattern expected = {new Bytecode{Opcode::Bit_match, {ANY_STRING, to_string(n)}}};
             Pattern match_n_bin = code_generation_utils.match_binary_pattern(to_string(n));
 
             EXPECT_EQ(match_n_bin, expected);
         }
         {
             Pattern match_0011 = code_generation_utils.match_binary_pattern("b0011");
-            Pattern expected = {{Opcode::Bit_match, {"b0011"}}};
+            Pattern expected = {new Bytecode{Opcode::Bit_match, {"b0011"}}};
 
             EXPECT_EQ(match_0011, expected);
         }
@@ -89,13 +89,13 @@ namespace {
 
     TEST(CodeGenerator, Or)
     {
-        Pattern e1 = {Bytecode{Opcode::Match, {"e1"}}};
-        Pattern e2 = {Bytecode{Opcode::Match, {"e2"}}};
+        Pattern e1 = {new Bytecode{Opcode::Match, {"e1"}}};
+        Pattern e2 = {new Bytecode{Opcode::Match, {"e2"}}};
         Pattern expected = {
-            {Opcode::Split, {to_string(1), to_string(3)}},
-            {Opcode::Match, {"e1"}},
-            {Opcode::Jump, {to_string(2)}},
-            {Opcode::Match, {"e2"}}
+            new Bytecode{Opcode::Split, {to_string(1), to_string(3)}},
+            new Bytecode{Opcode::Match, {"e1"}},
+            new Bytecode{Opcode::Jump, {to_string(2)}},
+            new Bytecode{Opcode::Match, {"e2"}}
         };
 
         Pattern e1_or_e2 = code_generation_utils.execute_or_operator(e1, e2);
@@ -104,17 +104,17 @@ namespace {
 
     TEST(CodeGenerator, Multiple_or)
     {
-        Pattern e1 = {Bytecode{Opcode::Match, {"e1"}}};
-        Pattern e2 = {Bytecode{Opcode::Match, {"e2"}}};
-        Pattern e3 = {Bytecode{Opcode::Match, {"e3"}}};
+        Pattern e1 = {new Bytecode{Opcode::Match, {"e1"}}};
+        Pattern e2 = {new Bytecode{Opcode::Match, {"e2"}}};
+        Pattern e3 = {new Bytecode{Opcode::Match, {"e3"}}};
         Pattern expected = {
-            {Opcode::Split, {to_string(1), to_string(6)}},
-            {Opcode::Split, {to_string(1), to_string(3)}},
-            {Opcode::Match, {"e1"}},
-            {Opcode::Jump, {to_string(2)}},
-            {Opcode::Match, {"e2"}},
-            {Opcode::Jump, {to_string(2)}},
-            {Opcode::Match, {"e3"}}
+            new Bytecode{Opcode::Split, {to_string(1), to_string(6)}},
+            new Bytecode{Opcode::Split, {to_string(1), to_string(3)}},
+            new Bytecode{Opcode::Match, {"e1"}},
+            new Bytecode{Opcode::Jump, {to_string(2)}},
+            new Bytecode{Opcode::Match, {"e2"}},
+            new Bytecode{Opcode::Jump, {to_string(2)}},
+            new Bytecode{Opcode::Match, {"e3"}}
         };
 
         Pattern e1_or_e2 = code_generation_utils.execute_or_operator(e1, e2);
@@ -127,11 +127,11 @@ namespace {
     {
         std::string str = "TO MATCH",
                     name = "a_string";
-        Pattern to_match = {Bytecode{Opcode::Match, {str}}};
+        Pattern to_match = {new Bytecode{Opcode::Match, {str}}};
         Pattern expected = {
-            {Opcode::Save_start, {name}},
-            {Opcode::Match, {str}},
-            {Opcode::Save_end, {name}}
+            new Bytecode{Opcode::Save_start, {name}},
+            new Bytecode{Opcode::Match, {str}},
+            new Bytecode{Opcode::Save_end, {name}}
         };
 
         Pattern saved = code_generation_utils.execute_save_variable(to_match, name);
@@ -140,11 +140,11 @@ namespace {
 
     TEST(CodeGenerator, kleene_star)
     {
-        Pattern e1 = {Bytecode{Opcode::Match, {"e1"}}};
+        Pattern e1 = {new Bytecode{Opcode::Match, {"e1"}}};
         Pattern expected = {
-            {Opcode::Split, {to_string(3), to_string(1)}},
-            {Opcode::Match, {"e1"}},
-            {Opcode::Jump, {to_string(-2)}},
+            new Bytecode{Opcode::Split, {to_string(3), to_string(1)}},
+            new Bytecode{Opcode::Match, {"e1"}},
+            new Bytecode{Opcode::Jump, {to_string(-2)}},
         };
 
         Pattern e1_star = code_generation_utils.execute_kleene_star(e1);
@@ -157,20 +157,20 @@ namespace {
                     name = "a_string";
 
         Pattern saved_string = {
-            {Opcode::Save_start, {name}},
-            {Opcode::Match, {str}},
-            {Opcode::Save_end, {name}}
+            new Bytecode{Opcode::Save_start, {name}},
+            new Bytecode{Opcode::Match, {str}},
+            new Bytecode{Opcode::Save_end, {name}}
         };
 
         Pattern expected = {
-            {Opcode::Save_start, {name}},
-            {Opcode::Match, {str}},
-            {Opcode::Save_end, {name}},
-            {Opcode::Add_iterate, {name}},
-            {Opcode::Split, {to_string(-4), to_string(1)}}
+            new Bytecode{Opcode::Save_start, {name}},
+            new Bytecode{Opcode::Match, {str}},
+            new Bytecode{Opcode::Save_end, {name}},
+            new Bytecode{Opcode::Add_iterate, {name}},
+            new Bytecode{Opcode::Split, {to_string(-4), to_string(1)}}
         };
 
-        Pattern repeat_saved_string = code_generation_utils.execute_iteration(saved_string, {name});
+        Pattern repeat_saved_string = code_generation_utils.execute_iteration(saved_string, {name}, "");
         EXPECT_EQ(expected, repeat_saved_string);
     }
 };

@@ -9,24 +9,6 @@
 #include <stack>
 #include <utility>
 
-typedef struct {
-    int bit = 0,
-        byte = 0;
-
-    void inc_bit()
-    {
-        bit = (bit + 1) % 8;
-        if(bit == 0)
-            ++byte;
-    }
-
-    void inc_byte()
-    {
-        ++byte;
-    }
-
-} Index;
-
 class VM
 {
 public:
@@ -44,26 +26,12 @@ private:
     Index last_match;
     int end;
 
-    typedef struct {
-        bool match = false;
-
-        Index index = {0, 0};
-
-        int pc = 0;
-
-        std::map<std::string, std::vector<unsigned char>> variables;
-        std::map<std::string, Index> vars_last_update;
-
-        std::map<std::string, int> iteration_counter;
-    } machine_state;
-
     bool match(machine_state &state);
     bool bit_match(machine_state &state);
     void jump(machine_state &state);
     void split(machine_state &state);
     void save_start(machine_state &state);
     void save_end(machine_state &state);
-    void add_iterate(machine_state &state);
 
     std::vector<unsigned char> text;
     int length = 0;
