@@ -107,13 +107,38 @@ namespace
                 new Bytecode{Opcode::Match, {"ANY", "2"}},
                 new Bytecode{Opcode::Save_end, {"name"}},
                 new Bytecode_add_iterate{Opcode::Add_iterate, {"name"}, "2"},
-                new Bytecode{Opcode::Split, {"-4", "1"}},
+                new Bytecode{Opcode::Jump, {"-4"}},
         };
 
         VM vm(code);
         auto output = vm.run("ABACAD.", 7);
 
         EXPECT_EQ(output.size(), 2);
+        EXPECT_THAT(output["name[0]"], ElementsAre('A', 'B'));
+        EXPECT_THAT(output["name[1]"], ElementsAre('A', 'C'));
+    }
+
+    TEST(VirtualMachine, LimitedIteration2)
+    {
+        Pattern code = {
+                new Bytecode{Opcode::Save_start, {"num"}},
+                new Bytecode{Opcode::Match, {"ANY", "1"}},
+                new Bytecode{Opcode::Save_end, {"num"}},
+                new Bytecode{Opcode::Save_start, {"name"}},
+                new Bytecode{Opcode::Match, {"ANY", "2"}},
+                new Bytecode{Opcode::Save_end, {"name"}},
+                new Bytecode_add_iterate{Opcode::Add_iterate, {"name"}, "(num + 2)/2"},
+                new Bytecode{Opcode::Jump, {"-4"}},
+                new Bytecode{Opcode::Return, {}}
+        };
+
+        VM vm(code);
+        std::vector<unsigned char> input = {2, 'A', 'B', 'A', 'C', 'A', 'D'};
+
+        auto output = vm.run(input, 7);
+
+        EXPECT_EQ(output.size(), 3);
+        EXPECT_THAT(output["num"], ElementsAre(2));
         EXPECT_THAT(output["name[0]"], ElementsAre('A', 'B'));
         EXPECT_THAT(output["name[1]"], ElementsAre('A', 'C'));
     }

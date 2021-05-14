@@ -66,7 +66,7 @@ void Bytecode_add_iterate::execute(machine_state &state)
         state.iteration_counter[name] = counter + 1;
     }
     
-    if(limit_expr != nullptr and limit_expr->eval({}) == iteration_counter + 1)
+    if(limit_expr != nullptr and limit_expr->eval(state.variables) == iteration_counter + 1)
         ++state.pc;
     
     ++state.pc;

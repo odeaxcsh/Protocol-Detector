@@ -164,9 +164,19 @@ bool VM::match(machine_state &state)
     int len = any ? std::stoi(instruction.args[1]) : instruction.args[0].size();
 
     int i = 0;
+
+    auto are_matched = [&](){
+        if(instruction.args[0][i] == '\\' && instruction.args[0][i+1] == '0') {
+            ++i;
+            return text[ibyte] == '\0';
+        } else {
+            return instruction.args[0][i] == text[ibyte];
+        }
+    };
+
     for(; i < len; ++i) {
         if ((any and ibyte < end) or
-        ((not any) and (instruction.args[0][i] == text[ibyte])))
+        ((not any) and are_matched()))
             ++ibyte;
         else break;
     }

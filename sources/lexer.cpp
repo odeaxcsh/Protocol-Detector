@@ -119,18 +119,14 @@ std::string Lexer::get_operand()
 
 std::string Lexer::get_expression()
 {
-    if((*text) == '(') {
-        int depth = 1;
-
-        return get_till([&depth](unsigned char c, bool){
-            int depth = 1;
-            if(c == '(')
-                ++depth;
-            else if(c == ')')
-                --depth;
-            return depth != 0;
-        });
-    } else return "";
+    int depth = 0;
+    return get_till([&depth](unsigned char c, bool){
+        if(c == '(')
+            ++depth;
+        else if(c == ')')
+            --depth;
+        return (depth != 0);
+    });
 }
 bool Lexer::is_eot(const std::string &str)
 {
