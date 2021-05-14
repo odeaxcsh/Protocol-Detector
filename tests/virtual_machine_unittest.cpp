@@ -94,10 +94,10 @@ namespace
         VM vm(code);
         auto output = vm.run("ABACAD.", 7);
 
-        EXPECT_EQ(output.size(), 4);
-        EXPECT_THAT(output["name0"], ElementsAre('A', 'B'));
-        EXPECT_THAT(output["name1"], ElementsAre('A', 'C'));
-        EXPECT_THAT(output["name2"], ElementsAre('A', 'D'));
+        EXPECT_EQ(output.size(), 3);
+        EXPECT_THAT(output["name[0]"], ElementsAre('A', 'B'));
+        EXPECT_THAT(output["name[1]"], ElementsAre('A', 'C'));
+        EXPECT_THAT(output["name[2]"], ElementsAre('A', 'D'));
     }
 
     TEST(ViraulMachine, Binary_matcher)

@@ -131,10 +131,11 @@ std::map<std::string, std::vector<unsigned char>> VM::run(std::vector<unsigned c
     last_match = state.index;
 
     for(const auto &[key, value] : state.var_starts) {
+        /*
         if((key.length() > counter_name.length()) and
             (0 == key.compare(key.length() - counter_name.length(), counter_name.length(), counter_name)))
             continue;
-
+        */
         const auto end = state.var_ends.find(key);
         if(end != state.var_ends.end()) {
             result[key] = (to_string(value, end->second, text));
@@ -233,24 +234,25 @@ void VM::add_iterate(machine_state &state)
     Bytecode instruction = code[state.pc];
 
     //returns index of where variable iteration counter placed
-    auto counter_name = [this](const std::string &name) -> std::string {
-        return name + this->counter_name;
+    
+    auto get_item_name = [this](const std::string &name, int count) -> std::string {
+        return name + "[" + std::to_string(count) + "]";
     };
+    
 
     //Set counters at VAR STARTS NAME
     for(const auto &name : instruction.args) {
-        if(state.var_starts.find(counter_name(name)) == state.var_starts.end())
-            state.var_starts[counter_name(name)] = {0, 0};
-    }
+        int counter = 
+            state.iteration_counter.find(name) == state.iteration_counter.end() ? 
+            0 : state.iteration_counter[name];
+        
+        std::string this_item_name = get_item_name(name, counter);
 
-    for(const auto &name : instruction.args) {
-        int counter_ = state.var_starts[counter_name(name)].byte;
-        std::string counter = std::to_string(counter_);
+        state.var_starts[this_item_name] = state.var_starts[name];
+        state.var_ends[this_item_name] = state.var_ends[name];
+        state.var_starts.erase(name);
 
-        state.var_starts[name + counter] = state.var_starts[name];
-        state.var_ends[name + counter] = state.var_ends[name];
-
-        state.var_starts[counter_name(name)].inc_byte();
+        state.iteration_counter[name] = counter + 1;
     }
 
     ++state.pc;

@@ -54,7 +54,7 @@ private:
         std::map<std::string, Index> var_starts;
         std::map<std::string, Index> var_ends;
 
-        std::map<int, int> iteration_counter;
+        std::map<std::string, int> iteration_counter;
     } machine_state;
 
     bool match(machine_state &state);
