@@ -21,9 +21,9 @@ public:
     count = 0;
   }
 
-  void run()
+  void run(const char *device_name)
   {
-    Sniffer sniffer("wlp3s0");
+    Sniffer sniffer(device_name);
     sniffer.sniff_loop(make_sniffer_handler(this, &Matcher::handle));
   }
 
@@ -62,5 +62,5 @@ int main(int argc, char *argv[])
   int count_limit = std::stoi(argv[1]);
 
   Matcher matcher(path, count_limit);
-  matcher.run();
+  matcher.run(argv[3]);
 }
