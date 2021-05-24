@@ -1,0 +1,12 @@
+[submodule "extern/googletest"]
+	path = extern/googletest
+	url = https://github.com/google/googletest.git
+	shallow = true
+[submodule "extern/libtins"]
+	path = extern/libtins
+	url = https://github.com/mfontanini/libtins.git
+	shallow = true
+[submodule "extern/jsoncpp"]
+	path = extern/jsoncpp
+	url = https://github.com/open-source-parsers/jsoncpp.git
+	shallow = true

@@ -6,34 +6,50 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 project(Protocol-detector VERSION 1.0)
 
-# Configure google-test as a downloadable library.
-set(EXECUTABLE_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin")
-
-set(PROJECT_MAIN_FILE "protocol_detector.cpp")
-
-#find JsonCPP
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(JSONCPP jsoncpp)
-include(External_LibTins.cmake)
-
 file(GLOB SOURCES "sources/*.cpp")
 
+# set executable path to build/bin
+set(EXECUTABLE_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin")
+
+# set project main file
+set(PROJECT_MAIN_FILE "protocol_detector.cpp")
+
+# add jsoncpp external project
+if(EXISTS "${PROJECT_SOURCE_DIR}/extern/jsoncpp/")
+    add_subdirectory("${PROJECT_SOURCE_DIR}/extern/jsoncpp/" EXCLUDE_FROM_ALL)
+
+    # include JSONCPP
+    get_target_property(JSON_INC_PATH jsoncpp_lib INTERFACE_INCLUDE_DIRECTORIES)
+    include_directories(${JSON_INC_PATH})
+    
+else()
+		message(FATAL_ERROR "Local JSONCPP submodule not found. To download with Git, run git submodule update --init")
+endif()
+
+# add libtins external project
+if(EXISTS "${PROJECT_SOURCE_DIR}/extern/libtins/")
+    add_subdirectory("${PROJECT_SOURCE_DIR}/extern/libtins" EXCLUDE_FROM_ALL)
+
+    # include LIBTINS file
+    include_directories (
+        SYSTEM
+        ${libtins_SOURCE_DIR}
+        ${libtins_SOURCE_DIR}/include
+    )
+else()
+		message(FATAL_ERROR "Local LIBTINS submodule not found. To download with Git, run git submodule update --init")
+endif()
+
+message(STATUS "external projects are complete")
+
+include_directories("${PROJECT_SOURCE_DIR}/include/")
+
 add_executable(${PROJECT_NAME} ${PROJECT_MAIN_FILE} ${SOURCES})
-target_include_directories(${PROJECT_NAME} PRIVATE  "${PROJECT_SOURCE_DIR}/include" "${JSONCPP_INCLUDE_DIRS}")
-target_link_libraries(${PROJECT_NAME} ${JSONCPP_LIBRARIES} ${TINS_LIBRARY})
+target_link_libraries(${PROJECT_NAME} tins jsoncpp_lib)
 
-include(CTest)
-include(External_GTest.cmake)
-file(GLOB TESTS "tests/*.cpp")
-
-set(TEST_MAIN_FILE "tests/run_tests.cpp")
-set(PROJECT_TEST "${PROJECT_NAME}-Test")
-
-add_executable(${PROJECT_TEST} ${TEST_MAIN_FILE} ${TESTS} ${SOURCES})
-
-target_include_directories(${PROJECT_TEST} PRIVATE  "${PROJECT_SOURCE_DIR}/include" "${JSONCPP_INCLUDE_DIRS}")
-target_link_libraries(${PROJECT_TEST} ${GTEST_LIBRARY} ${GMOCK_LIBRARY} ${JSONCPP_LIBRARIES} ${TINS_LIBRARY})
-
-
-add_test(NAME ${PROJECT_TEST} COMMAND ${PROJECT_TEST})
-set_tests_properties(${PROJECT_TEST} PROPERTIES TIMEOUT 1) 
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    include(CTest)
+    enable_testing()
+    include(GoogleTest)
+    add_subdirectory("${PROJECT_SOURCE_DIR}/tests/")
+endif()
