@@ -146,16 +146,18 @@ namespace {
 
         Pattern expected = {
             new Bytecode{Opcode::Match, {"x"}},
+            new Bytecode_add_iterate{Opcode::Add_iterate, {"binary1", "binary2"}, "3"},
+            new Bytecode{Opcode::Jump, {"2"}},
+            new Bytecode{Opcode::Jump, {"8"}},
             new Bytecode{Opcode::Save_start, {"binary1"}},
             new Bytecode{Opcode::Bit_match, {"b10"}},
             new Bytecode{Opcode::Save_end, {"binary1"}},
             new Bytecode{Opcode::Save_start, {"binary2"}},
             new Bytecode{Opcode::Bit_match, {"ANY", "32"}},
             new Bytecode{Opcode::Save_end, {"binary2"}},
-            new Bytecode_add_iterate{Opcode::Add_iterate, {"binary1", "binary2"}, "3"},
-            new Bytecode{Opcode::Jump, {"-7"}}
+            new Bytecode{Opcode::Jump, {"-9"}}
         };
-
+        
         EXPECT_EQ(expected, result);
     }
 }
