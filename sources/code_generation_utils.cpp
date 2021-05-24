@@ -87,23 +87,41 @@ Pattern Code_generation_utils::execute_iteration(const Pattern &matches_pattern,
     Pattern result;
     int matches_pattern_length = matches_pattern.size();
 
-    result.insert(end(result), begin(matches_pattern), end(matches_pattern));
+    if(limit_expr == "") {
+        result.insert(end(result), begin(matches_pattern), end(matches_pattern));
 
-    result.push_back(new Bytecode_add_iterate{
-        Opcode::Add_iterate,
-        names,
-        limit_expr,
-    });
-
-    if(limit_expr != "") {
-        result.push_back(new Bytecode{
-            Opcode::Jump,
-            {to_string(-matches_pattern_length - 1)}
+        result.push_back(new Bytecode_add_iterate{
+            Opcode::Add_iterate,
+            names,
+            limit_expr,
         });
-    } else {
+
         result.push_back(new Bytecode {
             Opcode::Split,
             {to_string(-matches_pattern_length - 1), to_string(1)}
+        });
+    } else {
+        result.push_back(new Bytecode_add_iterate{
+            Opcode::Add_iterate,
+            names,
+            limit_expr,
+        });
+
+        result.push_back(new Bytecode {
+            Opcode::Jump,
+            {std::to_string(2)}
+        });
+
+        result.push_back(new Bytecode {
+            Opcode::Jump,
+            {std::to_string(matches_pattern_length + 2)}
+        });
+
+        result.insert(end(result), begin(matches_pattern), end(matches_pattern));
+
+        result.push_back(new Bytecode {
+            Opcode::Jump,
+            {std::to_string(-matches_pattern_length - 3)}
         });
     }
 

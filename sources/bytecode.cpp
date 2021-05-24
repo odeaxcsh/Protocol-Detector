@@ -35,6 +35,27 @@ const std::string opcodes_name_map[]
 
 void Bytecode_add_iterate::execute(machine_state &state)
 {
+    ++state.pc;
+
+
+    bool valid_iteration = false;
+    // In counted iteration there is but cause implementation is like this
+    /*
+    Add iteration if condition
+    matching and capturing 
+    jump
+    */
+    // so there is an extra iteration with empty values which must be ignored
+    for(const auto &name : args) {
+        if(state.variables.find(name) != state.variables.end()) {
+            valid_iteration = true;
+            break;
+        }
+    }
+
+    if(not valid_iteration)
+        return;
+
     auto get_iteration_couter = [](int pc) {
         return "__iterator_counter_" + std::to_string(pc);
     };
@@ -68,6 +89,4 @@ void Bytecode_add_iterate::execute(machine_state &state)
     
     if(limit_expr != nullptr and limit_expr->eval(state.variables) == iteration_counter + 1)
         ++state.pc;
-    
-    ++state.pc;
 }
