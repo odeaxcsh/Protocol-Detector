@@ -102,7 +102,7 @@ Pattern Pattern_parser::iteration(bool itermatch)
     Pattern result = {};
     Pattern this_level = {};
 
-    Token token;
+    Token token = lexer.get_token();
     while(not (lexer.is_eot(token.value) or (token.type == Token_type::Iteration_stop and itermatch)))
     {
         bool currect = true;
