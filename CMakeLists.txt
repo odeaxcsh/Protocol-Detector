@@ -17,11 +17,12 @@ set(PROJECT_MAIN_FILE "protocol_detector.cpp")
 
 # add jsoncpp external project
 if(EXISTS "${PROJECT_SOURCE_DIR}/extern/jsoncpp/")
-    add_subdirectory("${PROJECT_SOURCE_DIR}/extern/jsoncpp/" EXCLUDE_FROM_ALL)
+    add_subdirectory("${PROJECT_SOURCE_DIR}/extern/jsoncpp/")
 
     # include JSONCPP
     get_target_property(JSON_INC_PATH jsoncpp_lib INTERFACE_INCLUDE_DIRECTORIES)
     include_directories(${JSON_INC_PATH})
+    set(JSONCPP_WITH_TESTS OFF)
     
 else()
 		message(FATAL_ERROR "Local JSONCPP submodule not found. To download with Git, run git submodule update --init")
@@ -29,7 +30,7 @@ endif()
 
 # add libtins external project
 if(EXISTS "${PROJECT_SOURCE_DIR}/extern/libtins/")
-    add_subdirectory("${PROJECT_SOURCE_DIR}/extern/libtins" EXCLUDE_FROM_ALL)
+    add_subdirectory("${PROJECT_SOURCE_DIR}/extern/libtins")
 
     # include LIBTINS file
     include_directories (
