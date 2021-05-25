@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 project(Protocol-detector VERSION 1.0)
 
 file(GLOB SOURCES "sources/*.cpp")
+add_library(main_lib SHARED ${SOURCES})
 
 # set executable path to build/bin
 set(EXECUTABLE_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin")
@@ -44,9 +45,9 @@ message(STATUS "external projects are complete")
 
 include_directories("${PROJECT_SOURCE_DIR}/include/")
 
-add_executable(${PROJECT_NAME} ${PROJECT_MAIN_FILE} ${SOURCES})
+add_executable(${PROJECT_NAME} ${PROJECT_MAIN_FILE})
 target_link_libraries(${PROJECT_NAME} tins jsoncpp_lib)
-
+target_link_libraries(${PROJECT_NAME} main_lib)
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     include(CTest)
     enable_testing()
