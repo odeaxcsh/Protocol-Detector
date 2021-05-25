@@ -21,7 +21,7 @@ set_target_properties(gmock_main PROPERTIES FOLDER extern)
 macro(quick_add_test TESTNAME)
     add_executable(${TESTNAME} ${ARGN} "${PROJECT_SOURCE_DIR}/tests/unittesting_utils.cpp")
     target_include_directories(${TESTNAME} PRIVATE "${PROJECT_SOURCE_DIR}/include")
-    target_link_libraries(${TESTNAME} gtest gmock gtest_main jsoncpp_lib main_lib)
+    target_link_libraries(${TESTNAME} main_lib gtest gmock gtest_main jsoncpp_lib)
     gtest_discover_tests(
         ${TESTNAME}
         WORKING_DIRECTORY ${PROJECT_DIR}
